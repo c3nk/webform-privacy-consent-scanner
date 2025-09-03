@@ -104,6 +104,54 @@ async function fetchDynamic(url) {
 
         // Wait a bit more after consent handling
         await delay(2000);
+
+        // Check for GTM and wait for it to load CMP scripts
+        try {
+          // Wait for GTM to be available
+          await page.waitForFunction(() => {
+            return window.google_tag_manager ||
+                   window.gtag ||
+                   document.querySelector('script[src*="googletagmanager.com"]') ||
+                   document.querySelector('script[src*="gtm.start"]');
+          }, { timeout: 5000 }).catch(() => {
+            // GTM not found, continue
+          });
+
+          // If GTM is detected, wait a bit more for CMP scripts to load
+          const hasGTM = await page.evaluate(() => {
+            return !!(window.google_tag_manager ||
+                     window.gtag ||
+                     document.querySelector('script[src*="googletagmanager.com"]') ||
+                     document.querySelector('script[src*="gtm.start"]') ||
+                     document.documentElement.innerHTML.includes('GTM-'));
+          });
+
+          if (hasGTM) {
+            console.log('GTM detected, waiting for CMP scripts to load...');
+            // Wait for potential CMP scripts loaded by GTM
+            await delay(3000);
+
+            // Check again for consent buttons after GTM loads
+            for (const selector of consentSelectors) {
+              try {
+                const element = await page.$(selector);
+                if (element) {
+                  const isVisible = await element.isVisible();
+                  if (isVisible) {
+                    await element.click();
+                    console.log(`Clicked GTM-loaded consent button: ${selector}`);
+                    await delay(1000);
+                    break;
+                  }
+                }
+              } catch (e) {
+                // Continue to next selector
+              }
+            }
+          }
+        } catch (gtmError) {
+          console.log(`GTM detection failed: ${gtmError.message}`);
+        }
       } catch (cmpError) {
         console.log(`CMP handling failed: ${cmpError.message}`);
       }

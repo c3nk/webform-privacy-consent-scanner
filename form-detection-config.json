@@ -167,6 +167,18 @@
         "vendor": "Generic CMP"
       },
       {
+        "type": "javascript",
+        "pattern": "googletagmanager\\.com|gtm\\.start",
+        "description": "Google Tag Manager",
+        "vendor": "Google Tag Manager"
+      },
+      {
+        "type": "html",
+        "pattern": "GTM-[A-Z0-9]+",
+        "description": "GTM Container ID",
+        "vendor": "Google Tag Manager"
+      },
+      {
         "type": "html",
         "pattern": "data-testid=[\"']cookie-consent[\"']",
         "description": "Cookie consent test IDs",
@@ -187,7 +199,11 @@
       ".efilli-consent",
       ".efilli-banner",
       "[data-efilli]",
-      "[class*='efilli']"
+      "[class*='efilli']",
+      "[data-gtm]",
+      ".gtm-banner",
+      ".gtm-consent",
+      "[class*='gtm']"
     ]
   },
   "metadata": {
@@ -195,6 +211,6 @@
     "last_updated": "2024-12-19",
     "author": "form-scanner",
     "supported_forms": ["google", "hubspot", "microsoft"],
-    "supported_cmp_vendors": ["Cookiebot", "OneTrust", "Cookie Consent", "Efilli", "Generic"]
+    "supported_cmp_vendors": ["Cookiebot", "OneTrust", "Cookie Consent", "Efilli", "Google Tag Manager", "Generic"]
   }
 }

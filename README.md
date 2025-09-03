@@ -68,17 +68,25 @@ When `--cmp` flag is enabled, the scanner:
    - Cookiebot
    - OneTrust
    - Efilli
+   - Google Tag Manager (GTM)
    - Generic GDPR/Cookie banners
 
 2. **Handles** consent banners automatically:
    - Finds and clicks accept buttons
    - Waits for consent processing
+   - **GTM Support**: Detects Google Tag Manager and waits for GTM-loaded CMP scripts
    - Continues with form detection
 
 3. **Reports** CMP information in output:
    - `has_cmp`: Boolean indicating CMP presence
-   - `cmp_vendor`: Detected CMP vendor name
+   - `cmp_vendor`: Detected CMP vendor name (including "Google Tag Manager")
    - `cmp_evidence`: Detection evidence
+
+4. **GTM Integration**:
+   - Detects GTM container IDs (GTM-XXXXXX)
+   - Waits for GTM to initialize
+   - Monitors for GTM-loaded CMP scripts
+   - Handles consent banners loaded via GTM triggers
 
 ## Filter Results
 
