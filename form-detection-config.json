@@ -144,6 +144,12 @@
       },
       {
         "type": "html",
+        "pattern": "efilli|efilli\\.com",
+        "description": "Efilli CMP",
+        "vendor": "Efilli"
+      },
+      {
+        "type": "html",
         "pattern": "gdpr|cookie-law|cookie-policy",
         "description": "Generic GDPR/Cookie consent",
         "vendor": "Generic"
@@ -177,7 +183,11 @@
       "a[href*='privacy']",
       ".gdpr-banner",
       ".cookie-banner",
-      ".consent-banner"
+      ".consent-banner",
+      ".efilli-consent",
+      ".efilli-banner",
+      "[data-efilli]",
+      "[class*='efilli']"
     ]
   },
   "metadata": {
@@ -185,6 +195,6 @@
     "last_updated": "2024-12-19",
     "author": "form-scanner",
     "supported_forms": ["google", "hubspot", "microsoft"],
-    "supported_cmp_vendors": ["Cookiebot", "OneTrust", "Cookie Consent", "Generic"]
+    "supported_cmp_vendors": ["Cookiebot", "OneTrust", "Cookie Consent", "Efilli", "Generic"]
   }
 }

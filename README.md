@@ -67,6 +67,7 @@ When `--cmp` flag is enabled, the scanner:
 1. **Detects** Cookie Consent Management Platforms:
    - Cookiebot
    - OneTrust
+   - Efilli
    - Generic GDPR/Cookie banners
 
 2. **Handles** consent banners automatically:
