@@ -6,9 +6,10 @@
 3. [Temel Kullanım](#temel-kullanım)
 4. [Gelişmiş Özellikler](#gelişmiş-özellikler)
 5. [Çıktı Formatları](#çıktı-formatları)
-6. [Sorun Giderme](#sorun-giderme)
-7. [Örnekler](#örnekler)
-8. [Performans İpuçları](#performans-ipuçları)
+6. [Filtreleme ve Raporlama](#filtreleme-ve-raporlama)
+7. [Sorun Giderme](#sorun-giderme)
+8. [Örnekler](#örnekler)
+9. [Performans İpuçları](#performans-ipuçları)
 
 ## Giriş
 
@@ -153,6 +154,90 @@ https://site.com,dynamic,200,false,true,false,hubspot,"HubSpot forms script",tru
 | `cmp_evidence` | CMP tespit kanıtı |
 | `note` | Ek notlar/hata mesajları |
 
+## Filtreleme ve Raporlama
+
+Tarama sonrası elde edilen sonuçları filtrelemek ve özel raporlar oluşturmak için `filter.mjs` script'ini kullanabilirsiniz.
+
+### Temel Filtreleme
+
+```bash
+# Google formları filtrele
+node filter.mjs --attr is_google_form --value true
+
+# HubSpot formları filtrele
+node filter.mjs --attr is_hubspot_form --value true
+
+# Microsoft formları filtrele
+node filter.mjs --attr is_microsoft_form --value true
+
+# Başarılı istekleri listele
+node filter.mjs --attr status --value 200
+```
+
+### Gelişmiş Filtreleme
+
+#### Case-Insensitive Arama
+```bash
+# detected_types array'inde "hubspot" ara (büyük/küçük harf duyarsız)
+node filter.mjs --attr detected_types --value hubspot --ci --contains
+```
+
+#### Contains (İçeren) Arama
+```bash
+# URL'de "university" kelimesi geçenleri bul
+node filter.mjs --attr url --value university --contains --ci
+```
+
+#### Farklı Input/Output Dosyaları
+```bash
+# Farklı input dosyası kullan
+node filter.mjs --input final-test.json --attr status --value 200 --out final-filtered.txt
+```
+
+### NPM Script Kullanımı
+```bash
+# Hazır script ile filtrele
+npm run filter
+```
+
+### Desteklenen Attribute Türleri
+
+| Tür | Örnekler | Kullanım |
+|-----|----------|----------|
+| **Boolean** | `is_google_form`, `is_hubspot_form`, `has_cmp` | `--value true/false` |
+| **String** | `url`, `method`, `evidence`, `cmp_vendor` | `--value "aranan_deger"` |
+| **Number** | `status` | `--value 200` |
+| **Array** | `detected_types` | `--value hubspot --contains` |
+
+### Rapor Formatı
+
+Filter script'i aşağıdaki formatta metin raporu oluşturur:
+
+```
+FILTER REPORT
+=============
+
+Input file: results.json
+Filter: is_google_form = true
+Total results: 4664
+Filtered results: 7
+
+RESULTS:
+--------
+1. https://example.com/form | status=200 | method=static | types=google
+2. https://another.com/contact | status=200 | method=dynamic | types=google
+...
+```
+
+### Özellikler
+
+- ✅ **Otomatik tip dönüşümü**: String değerler otomatik olarak doğru tipe çevrilir
+- ✅ **Dot notation desteği**: `foo.bar` şeklinde nested properties
+- ✅ **Case-insensitive arama**: `--ci` bayrağı ile
+- ✅ **Contains arama**: `--contains` bayrağı ile
+- ✅ **Array desteği**: Array alanlarda includes mantığı
+- ✅ **Hata toleransı**: JSON hatalarında anlamlı mesajlar
+
 ## Sorun Giderme
 
 ### Yaygın Sorunlar
@@ -192,6 +277,38 @@ node scanner.mjs --input urls.txt --timeout 30000
 ```bash
 node scanner.mjs --input urls.txt --concurrency 2
 ```
+
+#### 5. Node.js Fetch Başarısızlığı
+```
+STATIC_FETCH_ERROR for https://example.com: fetch failed, trying curl fallback...
+```
+
+**Belirti:**
+- Static modda "fetch failed" hatası
+- HubSpot formları tespit edilemiyor
+- Özellikle anti-bot koruması olan sitelerde (örn. `https://sea.ozyegin.edu.tr/`)
+
+**Neden:**
+- Node.js'in fetch API'si bazı web siteleri tarafından engelleniyor
+- SSL sertifika zinciri sorunları
+- Sistem seviyesinde network konfigürasyonu
+
+**Çözüm:**
+Scanner otomatik olarak curl fallback mekanizmasını kullanır:
+- İlk olarak Node.js fetch dener
+- Başarısız olursa sistem curl'una geçer
+- Browser benzeri User-Agent kullanır
+
+**Başarılı fallback örneği:**
+```
+STATIC_FETCH_ERROR for https://sea.ozyegin.edu.tr/: fetch failed, trying curl fallback...
+CURL_FALLBACK_SUCCESS for https://sea.ozyegin.edu.tr/: 58200 bytes
+[1/1] https://sea.ozyegin.edu.tr/ -> hubspot (static, 200)
+```
+
+**Gereksinimler:**
+- Sistemde `curl` komutunun yüklü olması (Linux/macOS'ta varsayılan)
+- Curl fallback otomatik olarak çalışır, manuel müdahale gerektirmez
 
 ### Log Analizi
 
@@ -237,8 +354,20 @@ node scanner.mjs --input large-list.txt --concurrency 16 --timeout 20000
 
 ### 5. Özel Filtreleme
 ```bash
-# Sadece HubSpot formları olan sonuçları filtrele
-node filter.mjs --attr is_hubspot_form --value true --input results.json
+# Sadece Google formları olan sonuçları filtrele
+node filter.mjs --attr is_google_form --value true --input results.json
+
+# Başarılı istekleri listele
+node filter.mjs --attr status --value 200
+
+# URL'de "edu" içeren üniversite sitelerini bul
+node filter.mjs --attr url --value edu --contains --ci
+
+# CMP tespit edilen siteleri listele
+node filter.mjs --attr has_cmp --value true
+
+# Farklı output dosyası kullan
+node filter.mjs --attr is_hubspot_form --value true --out hubspot-report.txt
 ```
 
 ## Performans İpuçları
@@ -276,6 +405,11 @@ node filter.mjs --attr is_hubspot_form --value true --input results.json
 
 2. **User Agent Rotasyonu:**
    - Bazı siteler botları engeller, farklı user agent'lar deneyin
+
+3. **Fetch Fallback:**
+   - Node.js fetch başarısız olursa otomatik olarak curl kullanılır
+   - Bu sayede anti-bot korumalı siteler de taranabilir
+   - Curl fallback sadece gerektiğinde çalışır, performans etkisi minimal
 
 ## Desteklenen Form Türleri
 

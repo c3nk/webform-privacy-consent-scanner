@@ -15,6 +15,7 @@ npm i
 # Put each URL on a separate line in urls.txt
 
 # Basic scan (Google, HubSpot, Microsoft forms)
+# Note: Automatic curl fallback for sites blocking Node.js fetch
 node scanner.mjs --input urls.txt --out results.csv
 
 # With CMP detection
@@ -59,6 +60,59 @@ The scanner can detect the following form types:
 - Short URLs: `forms.office.com/r/...`
 - Embedded iframes
 - Office UI framework references
+
+## Known Issues & Solutions
+
+### Node.js Fetch Failures
+
+**Problem**: Some websites block Node.js's built-in `fetch()` API, causing static mode to fail with "fetch failed" errors. This was observed on sites like `https://sea.ozyegin.edu.tr/` which uses HubSpot forms but couldn't be detected in static mode.
+
+**Symptoms**:
+```json
+{
+  "url": "https://example.com",
+  "method": "static",
+  "is_hubspot_form": false,
+  "detected_types": [],
+  "note": "static_error: fetch failed"
+}
+```
+
+**Root Cause**:
+- Node.js fetch API may be blocked by anti-bot protections
+- SSL certificate chain issues in some Node.js versions
+- System-level network configuration differences
+
+**Solution**: The scanner includes an automatic **curl fallback** mechanism:
+
+1. **Primary Method**: Tries Node.js `fetch()` with browser-like headers
+2. **Fallback Method**: If fetch fails, automatically switches to system `curl`
+3. **Result**: Successful detection even on problematic sites
+
+**Example with curl fallback**:
+```json
+{
+  "url": "https://sea.ozyegin.edu.tr/",
+  "method": "static",
+  "is_hubspot_form": true,
+  "detected_types": ["hubspot"],
+  "evidence": "hbspt.forms.create(",
+  "status": 200
+}
+```
+
+**Console output**:
+```
+STATIC_FETCH_ERROR for https://sea.ozyegin.edu.tr/: fetch failed, trying curl fallback...
+CURL_FALLBACK_SUCCESS for https://sea.ozyegin.edu.tr/: 58200 bytes
+[1/1] https://sea.ozyegin.edu.tr/ -> hubspot (static, 200)
+```
+
+**Technical Details**:
+- Curl fallback uses the same browser-like User-Agent
+- Maintains all security headers and timeout settings
+- Only activates when Node.js fetch fails
+- Requires `curl` to be available in system PATH (available on most Linux/macOS systems)
 
 ## CMP Detection Examples
 

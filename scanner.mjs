@@ -67,8 +67,13 @@ async function fetchStatic(url) {
       signal: ctrl.signal,
       redirect: 'follow',
       headers: {
-        'User-Agent': 'form-scanner/1.1 (+https://example.com)',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1'
       }
     });
     const status = r.status;
@@ -78,7 +83,51 @@ async function fetchStatic(url) {
       : '';
     return { status, text, contentType };
   } catch (err) {
-    return { status: 0, text: '', error: String(err && err.message || err) };
+    const errorMsg = err?.message || err?.code || String(err);
+    console.log(`STATIC_FETCH_ERROR for ${url}: ${errorMsg}, trying curl fallback...`);
+
+    // Try curl fallback
+    try {
+      const { spawn } = await import('child_process');
+      const curl = spawn('curl', [
+        '-s', '-L', '--max-time', Math.ceil(timeoutMs / 1000).toString(),
+        '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+        '-H', 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        '-H', 'Accept-Language: en-US,en;q=0.9',
+        url
+      ], { stdio: ['pipe', 'pipe', 'pipe'] });
+
+      let output = '';
+      let errorOutput = '';
+
+      curl.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+
+      curl.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+
+      return new Promise((resolve) => {
+        curl.on('close', (code) => {
+          if (code === 0 && output) {
+            console.log(`CURL_FALLBACK_SUCCESS for ${url}: ${output.length} bytes`);
+            resolve({ status: 200, text: output, contentType: 'text/html' });
+          } else {
+            console.log(`CURL_FALLBACK_FAILED for ${url}: exit code ${code}, error: ${errorOutput}`);
+            resolve({ status: 0, text: '', error: `fetch failed: ${errorMsg}, curl fallback failed: ${errorOutput}` });
+          }
+        });
+
+        curl.on('error', (error) => {
+          console.log(`CURL_FALLBACK_ERROR for ${url}: ${error.message}`);
+          resolve({ status: 0, text: '', error: `fetch failed: ${errorMsg}, curl error: ${error.message}` });
+        });
+      });
+    } catch (curlErr) {
+      console.log(`CURL_FALLBACK_UNAVAILABLE for ${url}: ${curlErr.message}`);
+      return { status: 0, text: '', error: `fetch failed: ${errorMsg}, curl unavailable: ${curlErr.message}` };
+    }
   } finally {
     clearTimeout(t);
   }
@@ -98,7 +147,7 @@ async function fetchDynamic(url) {
     browser = await chromium.launch({ headless: true });
     const ctx = await browser.newContext({
       viewport: { width: 1366, height: 900 },
-      userAgent: 'form-scanner/1.1'
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
     });
     const page = await ctx.newPage();
     const resp = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: timeoutMs });

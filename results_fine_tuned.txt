@@ -2,16 +2,8 @@ FILTER REPORT
 =============
 
 Input file: results.json
-Filter: detected_types = google_form
+Filter: is_hubspot_form = true
 Total results: 4664
-Filtered results: 7
+Filtered results: 0
 
-RESULTS:
---------
-1. https://www.ozyegin.edu.tr/tr/sektorel-egitim/dersler/sec-101 | status=200 | method=static | types=google_form
-2. https://www.ozyegin.edu.tr/tr/ic-mimarlik-ve-cevre-tasarimi/lisans/staj | status=200 | method=static | types=google_form
-3. https://www.ozyegin.edu.tr/tr/sektorel-egitim-ve-profesyonel-gelisim/sektorel-egitim/dersler/sec-101-universite-yasamina-giris | status=200 | method=static | types=google_form
-4. https://www.ozyegin.edu.tr/en/sectoral-solutions-courses/courses/sec-101-introduction-university | status=200 | method=static | types=google_form
-5. https://www.ozyegin.edu.tr/tr/node/8699 | status=200 | method=static | types=google_form
-6. https://www.ozyegin.edu.tr/en/sectoral-education/lessons/sec-101 | status=200 | method=static | types=google_form
-7. https://www.ozyegin.edu.tr/en/interior-architecture-and-environmental-design/undergraduate/internship | status=200 | method=static | types=google_form
+No results match the filter criteria.
