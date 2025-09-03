@@ -72,3 +72,19 @@ urls.txt
 results.csv
 results.json
 *.ndjson
+
+# Filter reports and temporary files
+results_fine_tuned*.txt
+custom-report*.txt
+final-filtered*.txt
+final-test*.*
+test-results*.*
+debug-results*.*
+html-based-results*.*
+simple-log-results*.*
+temp-results*.*
+*.tmp
+*.temp
+
+# All report files (if reports/ directory is used)
+reports/*
