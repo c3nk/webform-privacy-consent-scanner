@@ -32,6 +32,7 @@ if (!input) {
 // Prepare patterns from config (will be loaded in main)
 let patterns = {};
 let cmpPatterns = [];
+let globalConfig = null; // Global config for fetchDynamic
 
 // Detection functions will be defined in main after config loading
 
@@ -63,6 +64,7 @@ async function fetchStatic(url) {
 }
 
 async function fetchDynamic(url) {
+  console.log('DYNAMIC_MODE_START for:', url);
   let pw;
   try {
     pw = await import('playwright');
@@ -81,10 +83,12 @@ async function fetchDynamic(url) {
     const resp = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: timeoutMs });
 
     // Handle CMP banners if enabled
-    if (cmpFlag && config.cmp.enabled) {
+    console.log('CMP_FLAG_CHECK:', cmpFlag, 'GLOBAL_CONFIG_CMP_ENABLED:', globalConfig?.cmp?.enabled, 'GLOBAL_CONFIG_EXISTS:', !!globalConfig);
+    if (cmpFlag && globalConfig?.cmp?.enabled) {
+      console.log('CMP_CONDITION_MET');
       try {
         // Try to find and click common consent buttons
-        const consentSelectors = config.cmp.selectors || [];
+        const consentSelectors = globalConfig.cmp.selectors || [];
         for (const selector of consentSelectors) {
           try {
             const element = await page.$(selector);
@@ -105,42 +109,78 @@ async function fetchDynamic(url) {
         // Wait a bit more after consent handling
         await delay(2000);
 
-        // Check for GTM and wait for it to load CMP scripts
-        try {
-          // Wait for GTM to be available
-          await page.waitForFunction(() => {
-            return window.google_tag_manager ||
-                   window.gtag ||
-                   document.querySelector('script[src*="googletagmanager.com"]') ||
-                   document.querySelector('script[src*="gtm.start"]');
-          }, { timeout: 5000 }).catch(() => {
-            // GTM not found, continue
-          });
+                // Enhanced CMP detection for GTM and Efilli
+        console.log('CMP_START');
+        console.log('CMP_CHECK');
 
-          // If GTM is detected, wait a bit more for CMP scripts to load
-          const hasGTM = await page.evaluate(() => {
-            return !!(window.google_tag_manager ||
+                    // First check for immediate CMP presence
+          const html = await page.content();
+          const immediateCMP = {
+            hasEfilli: html.includes('efilli') || html.includes('efilli.com'),
+            hasGTM: html.includes('googletagmanager.com') || html.includes('GTM-'),
+            hasCookieConsent: html.includes('cookie') && (html.includes('consent') || html.includes('gdpr'))
+          };
+
+          console.log(`📊 Immediate CMP check: Efilli=${immediateCMP.hasEfilli}, GTM=${immediateCMP.hasGTM}, Consent=${immediateCMP.hasCookieConsent}`);
+
+          // Wait for GTM to be available
+          if (immediateCMP.hasGTM) {
+            await page.waitForFunction(() => {
+              return window.google_tag_manager ||
                      window.gtag ||
                      document.querySelector('script[src*="googletagmanager.com"]') ||
-                     document.querySelector('script[src*="gtm.start"]') ||
-                     document.documentElement.innerHTML.includes('GTM-'));
-          });
+                     document.querySelector('script[src*="gtm.start"]');
+            }, { timeout: 8000 }).catch(() => {
+              console.log('GTM initialization timeout');
+            });
+          }
 
-          if (hasGTM) {
-            console.log('GTM detected, waiting for CMP scripts to load...');
-            // Wait for potential CMP scripts loaded by GTM
-            await delay(3000);
+          // Special handling for Efilli
+          if (immediateCMP.hasEfilli || immediateCMP.hasGTM) {
+            console.log('Waiting for Efilli/CMP initialization...');
 
-            // Check again for consent buttons after GTM loads
-            for (const selector of consentSelectors) {
+            // Wait for Efilli script to be available
+            await page.waitForFunction(() => {
+              return document.querySelector('script[src*="efilli"]') ||
+                     document.querySelector('script[src*="bundles.efilli.com"]') ||
+                     window.Efilli ||
+                     document.documentElement.innerHTML.includes('efilli.com');
+            }, { timeout: 10000 }).catch(() => {
+              console.log('Efilli script detection timeout');
+            });
+
+            // Wait for Efilli to initialize and show consent UI
+            await delay(2000);
+
+            // Check for Efilli-specific consent elements
+            const efilliSelectors = [
+              '[data-efilli]',
+              '.efilli-consent',
+              '.efilli-banner',
+              '[class*="efilli"]',
+              'button[onclick*="efilli"]',
+              'button[onclick*="consent"]',
+              'button[onclick*="cookie"]',
+              '.cookie-consent',
+              '.gdpr-banner',
+              '.consent-modal',
+              '#cookie-consent',
+              '#gdpr-consent'
+            ];
+
+            console.log('Checking for Efilli consent elements...');
+            for (const selector of [...globalConfig.cmp.selectors, ...efilliSelectors]) {
               try {
                 const element = await page.$(selector);
                 if (element) {
                   const isVisible = await element.isVisible();
-                  if (isVisible) {
+                  const box = await element.boundingBox().catch(() => null);
+
+                  if (isVisible && box) {
+                    console.log(`Found visible consent element: ${selector}`);
                     await element.click();
-                    console.log(`Clicked GTM-loaded consent button: ${selector}`);
-                    await delay(1000);
+                    console.log(`Clicked consent button: ${selector}`);
+                    await delay(1500); // Wait for consent to be processed
                     break;
                   }
                 }
@@ -149,12 +189,13 @@ async function fetchDynamic(url) {
               }
             }
           }
-        } catch (gtmError) {
-          console.log(`GTM detection failed: ${gtmError.message}`);
+
+          // Additional wait for any dynamic content
+          await delay(2000);
+
+        } catch (cmpError) {
+          console.log(`Enhanced CMP detection failed: ${cmpError.message}`);
         }
-      } catch (cmpError) {
-        console.log(`CMP handling failed: ${cmpError.message}`);
-      }
     }
 
     await delay(dynamicWaitMs);
@@ -186,6 +227,7 @@ async function main() {
     const configPath = path.resolve(process.cwd(), 'form-detection-config.json');
     const configContent = await fs.promises.readFile(configPath, 'utf8');
     config = JSON.parse(configContent);
+    globalConfig = config; // Set global config for fetchDynamic
   } catch (err) {
     console.error('Error loading config file:', err.message);
     console.error('Make sure form-detection-config.json exists in the current directory');
@@ -204,6 +246,8 @@ async function main() {
   // Prepare CMP patterns
   cmpPatterns = config.cmp.enabled ?
     config.cmp.patterns.map(p => new RegExp(p.pattern, 'i')) : [];
+
+  console.log('CONFIG_LOADED: cmp.enabled =', config.cmp.enabled, 'cmpFlag =', cmpFlag);
 
   // Define detection functions after config is loaded
   function detectCMP(html) {
@@ -282,15 +326,20 @@ async function main() {
       }
     }
 
-    // Check for CMP
-    if (cmpFlag) {
-      const cmpResult = detectCMP(hay);
-      result.has_cmp = cmpResult.has_cmp;
-      result.cmp_vendor = cmpResult.cmp_vendor;
-      result.cmp_evidence = cmpResult.cmp_evidence;
-    }
+      // Check for CMP
+  if (cmpFlag) {
+    const cmpResult = detectCMP(hay);
+    result.has_cmp = cmpResult.has_cmp;
+    result.cmp_vendor = cmpResult.cmp_vendor;
+    result.cmp_evidence = cmpResult.cmp_evidence;
 
-    return result;
+    // Debug logging for CMP detection
+    if (cmpResult.has_cmp) {
+      console.log(`✅ CMP detected: ${cmpResult.cmp_vendor} (${cmpResult.cmp_evidence})`);
+    }
+  }
+
+  return result;
   }
 
   const start = Date.now();
@@ -309,7 +358,10 @@ async function main() {
     let det = detect(st.text, url);
     let method = 'static';
     let note = st.error ? `static_error: ${st.error}` : '';
-    if (det.detected_types.length === 0 && dynamicFlag) {
+    const shouldUseDynamic = (det.detected_types.length === 0 && dynamicFlag) || cmpFlag;
+    console.log(`[${n}/${urls.length}] ${url} -> ${shouldUseDynamic ? 'will use dynamic' : 'static only'} (${cmpFlag ? 'CMP enabled' : 'CMP disabled'})`);
+
+    if (shouldUseDynamic) {
       const dy = await fetchDynamic(url);
       const det2 = detect(dy.text, url);
       if (det2.detected_types.length > 0) {
