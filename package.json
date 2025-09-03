@@ -1,16 +1,15 @@
 {
-  "name": "form-scanner",
-  "version": "1.1.0",
-  "description": "Scan a list of URLs and detect embedded forms (Google, HubSpot, Microsoft) with CMP detection (static HTML or optional dynamic rendering).",
+  "name": "webform-privacy-consent-scanner",
+  "version": "0.1.0",
+  "description": "Advanced web form scanner detecting Google Forms, HubSpot Forms, Microsoft Forms with comprehensive CMP detection including Cookiebot, OneTrust, Efilli, and GDPR compliance auditing.",
   "type": "module",
   "bin": {
-    "form-scan": "scanner.mjs"
+    "webform-scanner": "scanner.mjs"
   },
   "scripts": {
-    "scan": "node scanner.mjs --input urls.txt --out results.csv",
-    "scan:dynamic": "node scanner.mjs --input urls.txt --out results.csv --dynamic --wait 6000",
-    "scan:cmp": "node scanner.mjs --input urls.txt --out results.csv --cmp",
-    "scan:full": "node scanner.mjs --input urls.txt --out results.csv --dynamic --wait 6000 --cmp",
+    "start": "node scanner.mjs --help",
+    "scan:static": "node scanner.mjs --input examples/urls.sample.txt --out examples/results.sample.csv --cmp",
+    "scan:full": "node scanner.mjs --input examples/urls.sample.txt --out examples/results.sample.csv --cmp",
     "filter": "node filter.mjs --input results.json --attr is_google_form --value true",
     "prepare": "node -e \"console.log('Ready')\""
   },

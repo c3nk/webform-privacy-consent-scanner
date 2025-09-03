@@ -1,239 +1,347 @@
-# form-scanner (Cursor Workspace)
+# Webform Privacy Consent Scanner
 
-Scan a list of URLs (e.g., 300) and detect whether they include **Google Forms**, **HubSpot forms**, or **Microsoft Forms**.
+[![CI](https://github.com/c3nk/webform-privacy-consent-scanner/actions/workflows/ci.yml/badge.svg)](https://github.com/c3nk/webform-privacy-consent-scanner/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
+[![npm version](https://img.shields.io/npm/v/webform-privacy-consent-scanner)](https://www.npmjs.com/package/webform-privacy-consent-scanner)
 
-- **Static HTML pass**: fast, uses Node's built-in `fetch` and pattern matching.
-- **Optional dynamic pass** (`--dynamic`): uses Playwright to render pages and catch forms injected by JavaScript.
-- **Optional CMP detection** (`--cmp`): detects Cookie Consent Management Platforms and can handle consent banners automatically.
+Advanced web form scanner detecting Google Forms, HubSpot Forms, Microsoft Forms with comprehensive CMP detection including Cookiebot, OneTrust, Efilli, and GDPR compliance auditing.
 
-## Quickstart
+![Webform Privacy Consent Scanner](docs/social-preview.png)
 
-```bash
-# Requires Node.js >= 18
-npm i
-
-# Put each URL on a separate line in urls.txt
-
-# Basic scan (Google, HubSpot, Microsoft forms)
-# Note: Automatic curl fallback for sites blocking Node.js fetch
-node scanner.mjs --input urls.txt --out results.csv
-
-# With CMP detection
-node scanner.mjs --input urls.txt --out results.csv --cmp
-
-# Full scan (dynamic + CMP)
-npm i -D playwright && npx playwright install
-npm run scan:full
-
-# Available npm scripts:
-npm run scan        # Basic static scan
-npm run scan:cmp    # Static scan with CMP detection
-npm run scan:full   # Dynamic scan with CMP handling
-
-## CLI Options
-
-- `--input <file>`: Input file with URLs (default: none, required)
-- `--out <file>`: Output CSV file (default: `results_TIMESTAMP.csv` with timestamp)
-- `--concurrency <n>`: Number of concurrent requests (default: `8`)
-- `--timeout <ms>`: Request timeout in milliseconds (default: `15000`)
-- `--dynamic`: Enable dynamic scanning with Playwright
-- `--wait <ms>`: Wait time for dynamic content (default: `6000`)
-- `--cmp`: Enable CMP detection and consent banner handling
-
-## Supported Forms
-
-The scanner can detect the following form types:
-
-### Google Forms
-- Direct URLs: `docs.google.com/forms/d/e/...`
-- Embedded iframes
-- Form action URLs
-
-### HubSpot Forms
-- Script: `js.hsforms.net/forms/v2.js`
-- API endpoints: `api.hsforms.com/submissions/...`
-- Inline JavaScript: `hbspt.forms.create()`
-- Form containers: `hubspotForm` IDs
-
-### Microsoft Forms
-- Response pages: `forms.office.com/Pages/ResponsePage.aspx`
-- Short URLs: `forms.office.com/r/...`
-- Embedded iframes
-- Office UI framework references
-
-## Known Issues & Solutions
-
-### Node.js Fetch Failures
-
-**Problem**: Some websites block Node.js's built-in `fetch()` API, causing static mode to fail with "fetch failed" errors. This was observed on sites like `https://sea.ozyegin.edu.tr/` which uses HubSpot forms but couldn't be detected in static mode.
-
-**Symptoms**:
-```json
-{
-  "url": "https://example.com",
-  "method": "static",
-  "is_hubspot_form": false,
-  "detected_types": [],
-  "note": "static_error: fetch failed"
-}
-```
-
-**Root Cause**:
-- Node.js fetch API may be blocked by anti-bot protections
-- SSL certificate chain issues in some Node.js versions
-- System-level network configuration differences
-
-**Solution**: The scanner includes an automatic **curl fallback** mechanism:
-
-1. **Primary Method**: Tries Node.js `fetch()` with browser-like headers
-2. **Fallback Method**: If fetch fails, automatically switches to system `curl`
-3. **Result**: Successful detection even on problematic sites
-
-**Example with curl fallback**:
-```json
-{
-  "url": "https://sea.ozyegin.edu.tr/",
-  "method": "static",
-  "is_hubspot_form": true,
-  "detected_types": ["hubspot"],
-  "evidence": "hbspt.forms.create(",
-  "status": 200
-}
-```
-
-**Console output**:
-```
-STATIC_FETCH_ERROR for https://sea.ozyegin.edu.tr/: fetch failed, trying curl fallback...
-CURL_FALLBACK_SUCCESS for https://sea.ozyegin.edu.tr/: 58200 bytes
-[1/1] https://sea.ozyegin.edu.tr/ -> hubspot (static, 200)
-```
-
-**Technical Details**:
-- Curl fallback uses the same browser-like User-Agent
-- Maintains all security headers and timeout settings
-- Only activates when Node.js fetch fails
-- Requires `curl` to be available in system PATH (available on most Linux/macOS systems)
-
-## CMP Detection Examples
-
-### GTM-Loaded CMP Detection
-When CMP scripts are loaded via Google Tag Manager:
+## 🚀 Quick Start
 
 ```bash
-# Detect CMP loaded through GTM
-node scanner.mjs --input urls.txt --out results.csv --cmp
+# Install
+npm install -g webform-privacy-consent-scanner
 
-# Output shows:
-# cmp_vendor: "Cookiebot" or "OneTrust" or "Efilli"
-# cmp_evidence: Detection pattern match
+# Basic scan with CMP detection
+webform-scanner --input urls.txt --out results.csv --cmp
+
+# Full scan with dynamic rendering
+webform-scanner --input urls.txt --dynamic --cmp --wait 8000
 ```
 
-### Efilli CMP Detection
-Efilli is a popular Turkish CMP platform:
+## 📋 Table of Contents
 
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Supported Platforms](#supported-platforms)
+- [Output Formats](#output-formats)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
+- [Security](#security)
+
+## ✨ Features
+
+- 🔍 **Multi-Platform Form Detection**: Google Forms, HubSpot Forms, Microsoft Forms
+- 🍪 **Comprehensive CMP Detection**: Cookiebot, OneTrust, Efilli, GTM, Generic GDPR
+- 🌐 **Advanced Scanning**: Static HTML + optional Playwright dynamic rendering
+- 🔄 **Smart Fallback**: Automatic curl fallback for blocked requests
+- 📊 **Multiple Outputs**: CSV, JSON, filtered text reports
+- ⚡ **High Performance**: Concurrent scanning with configurable limits
+- 🔒 **Privacy Focused**: Respects robots.txt, ethical scanning practices
+- 🎯 **CLI First**: Powerful command-line interface with extensive options
+
+## 📦 Installation
+
+### Requirements
+- Node.js >= 18
+- npm
+
+### Global Installation
 ```bash
-# Detect Efilli on Turkish websites
-node scanner.mjs --input turkish-sites.txt --out results.csv --cmp
-
-# Output shows:
-# cmp_vendor: "Efilli"
-# cmp_evidence: "efilli"
+npm install -g webform-privacy-consent-scanner
 ```
 
-### Real-World Example
-Testing on `https://www.ozyegin.edu.tr`:
-
-```json
-{
-  "url": "https://www.ozyegin.edu.tr",
-  "has_cmp": true,
-  "cmp_vendor": "Efilli",
-  "cmp_evidence": "efilli"
-}
-```
-
-## CMP Detection
-
-When `--cmp` flag is enabled, the scanner:
-
-1. **Detects** Cookie Consent Management Platforms:
-   - Cookiebot
-   - OneTrust
-   - Efilli
-   - Google Tag Manager (GTM)
-   - Generic GDPR/Cookie banners
-
-2. **Handles** consent banners automatically:
-   - Finds and clicks accept buttons
-   - Waits for consent processing
-   - **GTM Support**: Detects Google Tag Manager and waits for GTM-loaded CMP scripts
-   - Continues with form detection
-
-3. **Reports** CMP information in output:
-   - `has_cmp`: Boolean indicating CMP presence
-   - `cmp_vendor`: Detected CMP vendor name (including "Google Tag Manager")
-   - `cmp_evidence`: Detection evidence
-
-4. **GTM Integration**:
-   - Detects GTM container IDs (GTM-XXXXXX)
-   - Waits for GTM to initialize
-   - Monitors for GTM-loaded CMP scripts
-   - Handles consent banners loaded via GTM triggers
-
-## Filter Results
-
-After scanning, filter the `results.json` by any attribute-value pair and generate a text report:
-
+### Local Development
 ```bash
-# Filter by boolean values
+git clone https://github.com/c3nk/webform-privacy-consent-scanner.git
+cd webform-privacy-consent-scanner
+npm install
+
+# Optional: Install Playwright for dynamic scanning
+npm install -D playwright
+npx playwright install
+```
+
+## 🎯 Usage
+
+### Basic Scanning
+```bash
+# Scan URLs with CMP detection
+webform-scanner --input urls.txt --cmp
+
+# Output: results_2025-01-15T10-30-00.csv
+#         results_2025-01-15T10-30-00.json
+```
+
+### Advanced Options
+```bash
+# Dynamic scanning with custom wait
+webform-scanner --input urls.txt --dynamic --wait 10000 --cmp
+
+# High concurrency for large lists
+webform-scanner --input large-list.txt --concurrency 16 --timeout 20000
+
+# Custom output location
+webform-scanner --input urls.txt --out my-scan-results.csv
+```
+
+### Filtering Results
+```bash
+# Filter Google Forms
 node filter.mjs --attr is_google_form --value true
 
-# Filter by status codes
-node filter.mjs --attr status --value 200
+# Filter by CMP vendor
+node filter.mjs --attr cmp_vendor --value Cookiebot
 
-# Filter by detected types (case-insensitive)
-node filter.mjs --attr detected_types --value hubspot_form --ci
-
-# Filter URLs containing text (case-insensitive, contains)
-node filter.mjs --attr url --value university.edu --contains --ci
-
-# Custom input/output files
-node filter.mjs --input my-results.json --attr method --value dynamic --out custom-report.txt
+# Case-insensitive search
+node filter.mjs --attr url --value example.com --ci --contains
 ```
 
-### Filter Options
+## 🎪 Supported Platforms
 
-- `--input`: Input JSON file (default: `results.json`)
-- `--attr`: Attribute to filter by (supports dot notation, e.g., `foo.bar`)
-- `--value`: Value to match (auto-converts to number/boolean)
-- `--ci`: Case-insensitive string comparison
-- `--contains`: String/array includes matching
-- `--out`: Output text file (default: `results_fine_tuned.txt`)
+### Form Types
+- **Google Forms**: Direct URLs, embedded iframes, form actions
+- **HubSpot Forms**: Script detection, API endpoints, inline JavaScript
+- **Microsoft Forms**: Response pages, short URLs, Office UI framework
 
-### Output Format
+### CMP Platforms
+- **Cookiebot**: Popular EU CMP solution
+- **OneTrust**: Enterprise-grade consent management
+- **Efilli**: Turkish CMP platform
+- **Google Tag Manager**: GTM-loaded CMP detection
+- **Generic**: Standard GDPR/cookie consent banners
 
-The filter generates a clean text report with:
-- Summary header (input file, filter criteria, counts)
-- Simple list of matching URLs
-- Each line contains only the URL
+## 📊 Output Formats
 
-Example output:
+### CSV Format
+```csv
+url,has_google_forms,has_hubspot_forms,has_ms_forms,cmp_vendor,notes
+https://c3nk.com/,false,false,false,none,"static scan; no patterns found"
+https://example.com,dynamic,200,false,true,false,hubspot,"HubSpot forms script",true,Cookiebot,cookiebot
+```
+
+### JSON Format
+```json
+[
+  {
+    "url": "https://c3nk.com/",
+    "method": "static",
+    "status": 200,
+    "is_google_form": true,
+    "is_hubspot_form": false,
+    "is_microsoft_form": false,
+    "detected_types": ["google"],
+    "evidence": "Google Forms direct URL pattern",
+    "has_cmp": false,
+    "cmp_vendor": null,
+    "cmp_evidence": null,
+    "note": ""
+  }
+]
+```
+
+### Filtered Text Report
 ```
 FILTER REPORT
 =============
 
 Input file: results.json
 Filter: is_google_form = true
-Total results: 4664
-Filtered results: 13
+Total results: 1000
+Filtered results: 15
 
 RESULTS:
 --------
-https://hsri.ozyegin.edu.tr/en/design-thinking-in-the-age-of-ai-comparing-traditional-and-ai-assisted-creativity-in-architectural-design
-https://hsri.ozyegin.edu.tr/en/carbon-negative-recycled-concrete-solutions
-https://hsri.ozyegin.edu.tr/en/sustainable-biocemented-3d-printing
-https://www.ozyegin.edu.tr/tr/sektorel-egitim/dersler/sec-101
+https://c3nk.com/contact
+https://example.com/form
 ...
 ```
 
-**Note:** Output files include automatic timestamps (e.g., `results_fine_tuned_2025-09-03T11-14-55.txt`)
+## 🔧 CLI Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--input <file>` | Input file with URLs | Required |
+| `--out <file>` | Output file path | `results_TIMESTAMP.csv` |
+| `--concurrency <n>` | Number of concurrent requests | `8` |
+| `--timeout <ms>` | Request timeout | `15000` |
+| `--dynamic` | Enable dynamic scanning | `false` |
+| `--wait <ms>` | Wait time for dynamic content | `6000` |
+| `--cmp` | Enable CMP detection | `false` |
+
+## 📈 Examples
+
+### 1. Basic Website Audit
+```bash
+echo "https://c3nk.com/" > urls.txt
+webform-scanner --input urls.txt --cmp
+```
+
+### 2. Large Scale Scanning
+```bash
+webform-scanner --input company-websites.txt --concurrency 20 --cmp --dynamic
+```
+
+### 3. GDPR Compliance Audit
+```bash
+webform-scanner --input eu-websites.txt --cmp --out gdpr-audit.csv
+```
+
+### 4. Development Testing
+```bash
+npm run scan:static  # Uses examples/urls.sample.txt
+npm run scan:full    # Dynamic scanning with examples
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development
+```bash
+npm run start          # Show help
+npm run scan:static    # Test static scanning
+npm run scan:full      # Test dynamic scanning
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔒 Security
+
+Please see our [Security Policy](SECURITY.md) for responsible disclosure practices.
+
+### Responsible Use
+- Only scan websites you own or have permission to test
+- Respect robots.txt and website terms of service
+- Use for legitimate privacy compliance auditing only
+
+## 🗺️ Roadmap
+
+- [ ] Additional CMP platform support
+- [ ] Advanced filtering options
+- [ ] Web interface
+- [ ] API endpoints
+- [ ] Docker containerization
+- [ ] Integration with popular CI/CD platforms
+
+## 📞 Support
+
+- 📧 Email: me@c3nk.com
+- 🐛 Issues: [GitHub Issues](https://github.com/c3nk/webform-privacy-consent-scanner/issues)
+- 📖 Documentation: [User Guide](USERGUIDE.md) | [User Guide (TR)](USERGUIDE_TR.md)
+
+---
+
+**Built with ❤️ by [c3nk.com](https://c3nk.com/)**
+
+---
+
+# Webform Privacy Consent Scanner (Türkçe)
+
+[![CI](https://github.com/c3nk/webform-privacy-consent-scanner/actions/workflows/ci.yml/badge.svg)](https://github.com/c3nk/webform-privacy-consent-scanner/actions)
+[![Lisans: MIT](https://img.shields.io/badge/Lisans-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Google Forms, HubSpot Forms, Microsoft Forms tespit eden gelişmiş web form tarayıcı. Cookiebot, OneTrust, Efilli dahil kapsamlı CMP tespiti ve GDPR uyumluluk denetimi.
+
+## 🚀 Hızlı Başlangıç
+
+```bash
+# Kurulum
+npm install -g webform-privacy-consent-scanner
+
+# Temel tarama
+webform-scanner --input urls.txt --cmp
+
+# Tam tarama (dinamik)
+webform-scanner --input urls.txt --dynamic --cmp
+```
+
+## ✨ Özellikler
+
+- 🔍 **Çoklu Platform Form Tespiti**: Google Forms, HubSpot Forms, Microsoft Forms
+- 🍪 **Kapsamlı CMP Tespiti**: Cookiebot, OneTrust, Efilli, GTM, Genel GDPR
+- 🌐 **Gelişmiş Tarama**: Statik HTML + isteğe bağlı Playwright dinamik render
+- 🔄 **Akıllı Fallback**: Engellenen istekler için otomatik curl fallback
+- 📊 **Çoklu Çıktı**: CSV, JSON, filtrelenmiş metin raporları
+- ⚡ **Yüksek Performans**: Yapılandırılabilir limitlerle eşzamanlı tarama
+- 🔒 **Gizlilik Odaklı**: robots.txt'e saygı, etik tarama uygulamaları
+
+## 📦 Kurulum
+
+```bash
+# Global kurulum
+npm install -g webform-privacy-consent-scanner
+
+# Yerel geliştirme
+git clone https://github.com/c3nk/webform-privacy-consent-scanner.git
+cd webform-privacy-consent-scanner
+npm install
+```
+
+## 🎯 Kullanım
+
+### Temel Tarama
+```bash
+# URL'leri CMP tespiti ile tara
+webform-scanner --input urls.txt --cmp
+```
+
+### Gelişmiş Seçenekler
+```bash
+# Dinamik tarama
+webform-scanner --input urls.txt --dynamic --wait 10000 --cmp
+
+# Yüksek eşzamanlılık
+webform-scanner --input buyuk-liste.txt --concurrency 16 --timeout 20000
+```
+
+### Sonuçları Filtreleme
+```bash
+# Google formlarını filtrele
+node filter.mjs --attr is_google_form --value true
+
+# CMP sağlayıcısına göre filtrele
+node filter.mjs --attr cmp_vendor --value Cookiebot
+```
+
+## 🎪 Desteklenen Platformlar
+
+### Form Türleri
+- **Google Forms**: Doğrudan URL'ler, gömülü iframe'ler, form eylemleri
+- **HubSpot Forms**: Script tespiti, API uç noktaları, satır içi JavaScript
+- **Microsoft Forms**: Yanıt sayfaları, kısa URL'ler, Office UI framework
+
+### CMP Platformları
+- **Cookiebot**: Popüler AB CMP çözümü
+- **OneTrust**: Kurumsal düzeyde onay yönetimi
+- **Efilli**: Türk CMP platformu
+- **Google Tag Manager**: GTM üzerinden yüklenen CMP tespiti
+- **Genel**: Standart GDPR/çerez onay bannerları
+
+## 🤝 Katkıda Bulunma
+
+Katkılarınızı bekliyoruz! Detaylar için [Katkıda Bulunma Kılavuzu](CONTRIBUTING.md)'na bakın.
+
+## 📄 Lisans
+
+Bu proje MIT Lisansı altında lisanslanmıştır - detaylar için [LICENSE](LICENSE) dosyasına bakın.
+
+## 🔒 Güvenlik
+
+Sorumlu açıklama uygulamaları için [Güvenlik Politikası](SECURITY.md)'mıza bakın.
+
+**Sorumlu Kullanım:**
+- Sadece sahip olduğunuz veya test izniniz olan web sitelerini tarayın
+- robots.txt'e ve web sitesi kullanım koşullarına saygı gösterin
+- Sadece meşru gizlilik uyumluluk denetimi için kullanın
+
+---
+
+**❤️ ile yapıldı: [c3nk.com](https://c3nk.com/)**
