@@ -1,0 +1,2 @@
+url,method,status,is_google_form,is_hubspot_form,is_microsoft_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,note
+https://www.ozyegin.edu.tr,static,200,false,false,false,,,true,Efilli,efilli,dynamic_error: config is not defined

@@ -1,0 +1,16 @@
+[
+  {
+    "url": "https://www.ozyegin.edu.tr",
+    "method": "static",
+    "status": 200,
+    "is_google_form": false,
+    "is_hubspot_form": false,
+    "is_microsoft_form": false,
+    "detected_types": [],
+    "evidence": null,
+    "has_cmp": true,
+    "cmp_vendor": "Efilli",
+    "cmp_evidence": "efilli",
+    "note": "dynamic_error: config is not defined"
+  }
+]

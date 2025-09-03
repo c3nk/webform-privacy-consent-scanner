@@ -17,15 +17,36 @@ const getArg = (name, def = undefined) => {
 };
 
 const input = getArg('input');
-const out = getArg('out', 'results.csv');
+const out = getArg('out');
 const concurrency = parseInt(getArg('concurrency', '8'), 10);
 const timeoutMs = parseInt(getArg('timeout', '15000'), 10);
 const dynamicFlag = !!getArg('dynamic', false);
 const dynamicWaitMs = parseInt(getArg('wait', '6000'), 10);
 const cmpFlag = !!getArg('cmp', false);
 
+// Generate timestamp for output files if not specified
+function generateTimestampedFilename(baseName) {
+  const now = new Date();
+  const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5); // YYYY-MM-DDTHH-MM-SS format
+  const extension = baseName.split('.').pop();
+  const nameWithoutExt = baseName.replace('.' + extension, '');
+  return `${nameWithoutExt}_${timestamp}.${extension}`;
+}
+
+// Determine output filenames
+let outputCsv, outputJson;
+if (out) {
+  outputCsv = out;
+  outputJson = out.replace(/\.csv$/i, '.json');
+} else {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+  outputCsv = `results_${timestamp}.csv`;
+  outputJson = `results_${timestamp}.json`;
+}
+
 if (!input) {
-  console.error('Usage: node scanner.mjs --input urls.txt --out results.csv [--concurrency 8] [--timeout 15000] [--dynamic] [--wait 6000] [--cmp]');
+  console.error('Usage: node scanner.mjs --input urls.txt [--out results.csv] [--concurrency 8] [--timeout 15000] [--dynamic] [--wait 6000] [--cmp]');
+  console.error('Note: If --out is not specified, files will be saved with timestamp (e.g., results_2024-12-19T14-30-22.csv)');
   process.exit(1);
 }
 
@@ -404,12 +425,12 @@ async function main() {
   }));
 
   await Promise.all(tasks);
-  await fs.promises.writeFile(path.resolve(process.cwd(), out), rows.join('\n'), 'utf8');
-  await fs.promises.writeFile(path.resolve(process.cwd(), out.replace(/\.csv$/i, '.json')), JSON.stringify(resultsJson, null, 2), 'utf8');
+  await fs.promises.writeFile(path.resolve(process.cwd(), outputCsv), rows.join('\n'), 'utf8');
+  await fs.promises.writeFile(path.resolve(process.cwd(), outputJson), JSON.stringify(resultsJson, null, 2), 'utf8');
 
   const dur = ((Date.now() - start)/1000).toFixed(2);
-  console.log(`\nSaved CSV to ${out}`);
-  console.log(`Saved JSON to ${out.replace(/\.csv$/i, '.json')}`);
+  console.log(`\nSaved CSV to ${outputCsv}`);
+  console.log(`Saved JSON to ${outputJson}`);
   console.log(`Done in ${dur}s`);
 }
 

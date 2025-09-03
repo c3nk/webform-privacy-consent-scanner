@@ -32,7 +32,7 @@ npm run scan:full   # Dynamic scan with CMP handling
 ## CLI Options
 
 - `--input <file>`: Input file with URLs (default: none, required)
-- `--out <file>`: Output CSV file (default: `results.csv`)
+- `--out <file>`: Output CSV file (default: `results_TIMESTAMP.csv` with timestamp)
 - `--concurrency <n>`: Number of concurrent requests (default: `8`)
 - `--timeout <ms>`: Request timeout in milliseconds (default: `15000`)
 - `--dynamic`: Enable dynamic scanning with Playwright
