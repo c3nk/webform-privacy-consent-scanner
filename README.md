@@ -60,6 +60,44 @@ The scanner can detect the following form types:
 - Embedded iframes
 - Office UI framework references
 
+## CMP Detection Examples
+
+### GTM-Loaded CMP Detection
+When CMP scripts are loaded via Google Tag Manager:
+
+```bash
+# Detect CMP loaded through GTM
+node scanner.mjs --input urls.txt --out results.csv --cmp
+
+# Output shows:
+# cmp_vendor: "Cookiebot" or "OneTrust" or "Efilli"
+# cmp_evidence: Detection pattern match
+```
+
+### Efilli CMP Detection
+Efilli is a popular Turkish CMP platform:
+
+```bash
+# Detect Efilli on Turkish websites
+node scanner.mjs --input turkish-sites.txt --out results.csv --cmp
+
+# Output shows:
+# cmp_vendor: "Efilli"
+# cmp_evidence: "efilli"
+```
+
+### Real-World Example
+Testing on `https://www.ozyegin.edu.tr`:
+
+```json
+{
+  "url": "https://www.ozyegin.edu.tr",
+  "has_cmp": true,
+  "cmp_vendor": "Efilli",
+  "cmp_evidence": "efilli"
+}
+```
+
 ## CMP Detection
 
 When `--cmp` flag is enabled, the scanner:
