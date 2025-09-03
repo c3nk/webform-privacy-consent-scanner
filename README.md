@@ -51,6 +51,9 @@ webform-scanner --input urls.txt --dynamic --cmp --wait 8000
 - Node.js >= 18
 - npm
 
+### Optional Dependencies
+- **Playwright** (for dynamic scanning): `npm install -D playwright && npx playwright install`
+
 ### Global Installation
 ```bash
 npm install -g webform-privacy-consent-scanner

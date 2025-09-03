@@ -139,7 +139,9 @@ async function fetchDynamic(url) {
   try {
     pw = await import('playwright');
   } catch (e) {
-    return { status: 0, text: '', error: 'playwright not installed. Run: npm i -D playwright && npx playwright install' };
+    console.log('⚠️  Playwright not installed, falling back to static mode');
+    console.log('💡 Tip: Install Playwright for dynamic scanning: npm i -D playwright && npx playwright install');
+    return { status: 0, text: '', error: 'playwright_not_available' };
   }
   const { chromium } = pw;
   let browser;
@@ -438,7 +440,13 @@ async function main() {
         det = det2;
         method = 'dynamic';
       }
-      if (dy.error) note = (note ? note + ' | ' : '') + `dynamic_error: ${dy.error}`;
+      if (dy.error) {
+        if (dy.error === 'playwright_not_available') {
+          note = (note ? note + ' | ' : '') + 'dynamic_mode_skipped: Playwright not available (install with: npm i -D playwright && npx playwright install)';
+        } else {
+          note = (note ? note + ' | ' : '') + `dynamic_error: ${dy.error}`;
+        }
+      }
       if (dy.status) st.status = dy.status;
     }
     const detectedTypes = det.detected_types.join(';');
