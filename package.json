@@ -2,10 +2,35 @@
   "name": "webform-privacy-consent-scanner",
   "version": "0.1.0",
   "description": "Advanced web form scanner detecting Google Forms, HubSpot Forms, Microsoft Forms with comprehensive CMP detection including Cookiebot, OneTrust, Efilli, and GDPR compliance auditing.",
+  "main": "scanner.mjs",
   "type": "module",
   "bin": {
     "webform-scanner": "scanner.mjs"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/c3nk/webform-privacy-consent-scanner.git"
+  },
+  "homepage": "https://github.com/c3nk/webform-privacy-consent-scanner#readme",
+  "bugs": {
+    "url": "https://github.com/c3nk/webform-privacy-consent-scanner/issues"
+  },
+  "keywords": [
+    "web-scanner",
+    "privacy",
+    "gdpr",
+    "forms",
+    "google-forms",
+    "hubspot-forms",
+    "microsoft-forms",
+    "cmp",
+    "cookiebot",
+    "onetrust",
+    "consent-management",
+    "cli"
+  ],
+  "author": "c3nk.com <me@c3nk.com>",
+  "license": "MIT",
   "scripts": {
     "start": "node scanner.mjs --help",
     "scan:static": "node scanner.mjs --input examples/urls.sample.txt --out examples/results.sample.csv --cmp",
