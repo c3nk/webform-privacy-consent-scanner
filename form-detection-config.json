@@ -1,0 +1,190 @@
+{
+  "version": "1.0.0",
+  "forms": {
+    "google": {
+      "name": "Google Forms",
+      "enabled": true,
+      "patterns": [
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/docs\\.google\\.com\\/forms\\/d\\/e\\/[A-Za-z0-9_-]+\\/(?:viewform|formResponse)",
+          "description": "Google Forms direct URL pattern"
+        },
+        {
+          "type": "html",
+          "pattern": "<iframe[^>]+src=[\"']https?:\\/\\/docs\\.google\\.com\\/forms\\/[^\"']+[\"']",
+          "description": "Google Forms iframe embed"
+        },
+        {
+          "type": "html",
+          "pattern": "<form[^>]+action=[\"']https?:\\/\\/docs\\.google\\.com\\/forms\\/[^\"']+[\"']",
+          "description": "Google Forms form action"
+        },
+        {
+          "type": "html",
+          "pattern": "docs\\.google\\.com\\/forms",
+          "description": "General Google Forms reference"
+        }
+      ]
+    },
+    "hubspot": {
+      "name": "HubSpot Forms",
+      "enabled": true,
+      "patterns": [
+        {
+          "type": "script",
+          "pattern": "https?:\\/\\/js\\.hsforms\\.net\\/forms\\/(?:embed\\/)?v2\\.js",
+          "description": "HubSpot forms script"
+        },
+        {
+          "type": "javascript",
+          "pattern": "hbspt\\.forms\\.create\\s*\\(",
+          "description": "HubSpot forms.create function call"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/api\\.hsforms\\.com\\/submissions\\/v3\\/integration\\/submit\\/\\d+\\/[0-9a-f-]+",
+          "description": "HubSpot API submission endpoint"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/forms\\.hubspot\\.com\\/uploads\\/form\\/v2\\/\\d+\\/[0-9a-f-]+",
+          "description": "HubSpot form upload endpoint"
+        },
+        {
+          "type": "html",
+          "pattern": "<div[^>]+id=[\"']hubspotForm[\"'][^>]*>",
+          "description": "HubSpot form container"
+        },
+        {
+          "type": "html",
+          "pattern": "data-hs-captcha",
+          "description": "HubSpot captcha element"
+        },
+        {
+          "type": "javascript",
+          "pattern": "portalId[\"']?\\s*:\\s*\\d+",
+          "description": "HubSpot portal ID"
+        },
+        {
+          "type": "html",
+          "pattern": "hs-script-[a-f0-9]+",
+          "description": "HubSpot script ID"
+        }
+      ]
+    },
+    "microsoft": {
+      "name": "Microsoft Forms",
+      "enabled": true,
+      "patterns": [
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/forms\\.office\\.com\\/Pages\\/ResponsePage\\.aspx\\?id=[^&\\/]+",
+          "description": "Microsoft Forms response page URL"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/forms\\.office\\.com\\/r\\/[A-Za-z0-9_-]+",
+          "description": "Microsoft Forms short response URL"
+        },
+        {
+          "type": "html",
+          "pattern": "<iframe[^>]+src=[\"']https?:\\/\\/forms\\.office\\.com\\/[^\"']+[\"']",
+          "description": "Microsoft Forms iframe embed"
+        },
+        {
+          "type": "javascript",
+          "pattern": "forms\\.office\\.com",
+          "description": "Microsoft Forms domain reference"
+        },
+        {
+          "type": "html",
+          "pattern": "data-form-id=[\"'][A-Za-z0-9_-]+[\"']",
+          "description": "Microsoft Forms data attribute"
+        },
+        {
+          "type": "html",
+          "pattern": "class=[\"'][^\"']*office-form[^\"']*[\"']",
+          "description": "Microsoft Forms CSS class"
+        },
+        {
+          "type": "javascript",
+          "pattern": "OfficeFabric",
+          "description": "Microsoft Office UI framework"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/forms\\.microsoft\\.com\\/[A-Za-z0-9_-]+",
+          "description": "Microsoft Forms domain"
+        }
+      ]
+    }
+  },
+  "cmp": {
+    "name": "Cookie Consent Management Platform",
+    "enabled": true,
+    "patterns": [
+      {
+        "type": "html",
+        "pattern": "cookiebot|cookiebot\\.com",
+        "description": "Cookiebot CMP",
+        "vendor": "Cookiebot"
+      },
+      {
+        "type": "html",
+        "pattern": "onetrust|onetrust\\.com",
+        "description": "OneTrust CMP",
+        "vendor": "OneTrust"
+      },
+      {
+        "type": "html",
+        "pattern": "cookieconsent|cookieconsent\\.com",
+        "description": "Cookie Consent CMP",
+        "vendor": "Cookie Consent"
+      },
+      {
+        "type": "html",
+        "pattern": "gdpr|cookie-law|cookie-policy",
+        "description": "Generic GDPR/Cookie consent",
+        "vendor": "Generic"
+      },
+      {
+        "type": "html",
+        "pattern": "accept-cookies|cookie-accept|consent-accept",
+        "description": "Cookie acceptance buttons",
+        "vendor": "Generic"
+      },
+      {
+        "type": "javascript",
+        "pattern": "__cmp|__tcfapi",
+        "description": "CMP API functions",
+        "vendor": "Generic CMP"
+      },
+      {
+        "type": "html",
+        "pattern": "data-testid=[\"']cookie-consent[\"']",
+        "description": "Cookie consent test IDs",
+        "vendor": "Generic"
+      }
+    ],
+    "selectors": [
+      "[data-testid*='cookie']",
+      "[id*='cookie']",
+      "[class*='cookie']",
+      "[data-cy*='consent']",
+      "[aria-label*='cookie']",
+      "button[onclick*='accept']",
+      "a[href*='privacy']",
+      ".gdpr-banner",
+      ".cookie-banner",
+      ".consent-banner"
+    ]
+  },
+  "metadata": {
+    "description": "Form detection and CMP patterns configuration",
+    "last_updated": "2024-12-19",
+    "author": "form-scanner",
+    "supported_forms": ["google", "hubspot", "microsoft"],
+    "supported_cmp_vendors": ["Cookiebot", "OneTrust", "Cookie Consent", "Generic"]
+  }
+}

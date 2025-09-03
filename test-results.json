@@ -1,0 +1,48 @@
+[
+  {
+    "url": "https://docs.google.com/forms/d/e/1FAIpQLScfV1rJRlLrQ4jG5YLqUQ4jJQW7L8jGQZqJ8J8JQW7L8jGQ/viewform",
+    "method": "static",
+    "status": 404,
+    "is_google_form": true,
+    "is_hubspot_form": false,
+    "is_microsoft_form": false,
+    "detected_types": [
+      "google"
+    ],
+    "evidence": "Google Forms direct URL pattern",
+    "has_cmp": false,
+    "cmp_vendor": null,
+    "cmp_evidence": null,
+    "note": ""
+  },
+  {
+    "url": "https://forms.office.com/r/1234567890",
+    "method": "static",
+    "status": 200,
+    "is_google_form": false,
+    "is_hubspot_form": false,
+    "is_microsoft_form": true,
+    "detected_types": [
+      "microsoft"
+    ],
+    "evidence": "Microsoft Forms short response URL",
+    "has_cmp": false,
+    "cmp_vendor": null,
+    "cmp_evidence": null,
+    "note": ""
+  },
+  {
+    "url": "https://example.com",
+    "method": "static",
+    "status": 200,
+    "is_google_form": false,
+    "is_hubspot_form": false,
+    "is_microsoft_form": false,
+    "detected_types": [],
+    "evidence": null,
+    "has_cmp": false,
+    "cmp_vendor": null,
+    "cmp_evidence": null,
+    "note": ""
+  }
+]

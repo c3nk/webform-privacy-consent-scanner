@@ -1,9 +1,10 @@
 # form-scanner (Cursor Workspace)
 
-Scan a list of URLs (e.g., 300) and detect whether they include **Google Forms** or **HubSpot forms**.
+Scan a list of URLs (e.g., 300) and detect whether they include **Google Forms**, **HubSpot forms**, or **Microsoft Forms**.
 
 - **Static HTML pass**: fast, uses Node's built-in `fetch` and pattern matching.
-- **Optional dynamic pass** (`--dynamic`): uses Playwright to render pages and catch forms injected by JavaScript (e.g., HubSpot `hbspt.forms.create` after consent).
+- **Optional dynamic pass** (`--dynamic`): uses Playwright to render pages and catch forms injected by JavaScript.
+- **Optional CMP detection** (`--cmp`): detects Cookie Consent Management Platforms and can handle consent banners automatically.
 
 ## Quickstart
 
@@ -12,11 +13,71 @@ Scan a list of URLs (e.g., 300) and detect whether they include **Google Forms**
 npm i
 
 # Put each URL on a separate line in urls.txt
+
+# Basic scan (Google, HubSpot, Microsoft forms)
 node scanner.mjs --input urls.txt --out results.csv
 
-# If forms load after consent / JS:
+# With CMP detection
+node scanner.mjs --input urls.txt --out results.csv --cmp
+
+# Full scan (dynamic + CMP)
 npm i -D playwright && npx playwright install
-npm run scan:dynamic
+npm run scan:full
+
+# Available npm scripts:
+npm run scan        # Basic static scan
+npm run scan:cmp    # Static scan with CMP detection
+npm run scan:full   # Dynamic scan with CMP handling
+
+## CLI Options
+
+- `--input <file>`: Input file with URLs (default: none, required)
+- `--out <file>`: Output CSV file (default: `results.csv`)
+- `--concurrency <n>`: Number of concurrent requests (default: `8`)
+- `--timeout <ms>`: Request timeout in milliseconds (default: `15000`)
+- `--dynamic`: Enable dynamic scanning with Playwright
+- `--wait <ms>`: Wait time for dynamic content (default: `6000`)
+- `--cmp`: Enable CMP detection and consent banner handling
+
+## Supported Forms
+
+The scanner can detect the following form types:
+
+### Google Forms
+- Direct URLs: `docs.google.com/forms/d/e/...`
+- Embedded iframes
+- Form action URLs
+
+### HubSpot Forms
+- Script: `js.hsforms.net/forms/v2.js`
+- API endpoints: `api.hsforms.com/submissions/...`
+- Inline JavaScript: `hbspt.forms.create()`
+- Form containers: `hubspotForm` IDs
+
+### Microsoft Forms
+- Response pages: `forms.office.com/Pages/ResponsePage.aspx`
+- Short URLs: `forms.office.com/r/...`
+- Embedded iframes
+- Office UI framework references
+
+## CMP Detection
+
+When `--cmp` flag is enabled, the scanner:
+
+1. **Detects** Cookie Consent Management Platforms:
+   - Cookiebot
+   - OneTrust
+   - Generic GDPR/Cookie banners
+
+2. **Handles** consent banners automatically:
+   - Finds and clicks accept buttons
+   - Waits for consent processing
+   - Continues with form detection
+
+3. **Reports** CMP information in output:
+   - `has_cmp`: Boolean indicating CMP presence
+   - `cmp_vendor`: Detected CMP vendor name
+   - `cmp_evidence`: Detection evidence
 
 ## Filter Results
 

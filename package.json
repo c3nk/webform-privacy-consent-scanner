@@ -1,7 +1,7 @@
 {
   "name": "form-scanner",
   "version": "1.1.0",
-  "description": "Scan a list of URLs and detect embedded Google Forms or HubSpot forms (static HTML or optional dynamic rendering).",
+  "description": "Scan a list of URLs and detect embedded forms (Google, HubSpot, Microsoft) with CMP detection (static HTML or optional dynamic rendering).",
   "type": "module",
   "bin": {
     "form-scan": "scanner.mjs"
@@ -9,6 +9,8 @@
   "scripts": {
     "scan": "node scanner.mjs --input urls.txt --out results.csv",
     "scan:dynamic": "node scanner.mjs --input urls.txt --out results.csv --dynamic --wait 6000",
+    "scan:cmp": "node scanner.mjs --input urls.txt --out results.csv --cmp",
+    "scan:full": "node scanner.mjs --input urls.txt --out results.csv --dynamic --wait 6000 --cmp",
     "filter": "node filter.mjs --input results.json --attr is_hubspot_form --value true",
     "prepare": "node -e \"console.log('Ready')\""
   },

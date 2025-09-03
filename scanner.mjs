@@ -3,7 +3,7 @@
  * form-scanner: Detect Google Forms or HubSpot forms on a list of URLs.
  * Requires Node.js >= 18 (built-in fetch). Optional: playwright for --dynamic.
  */
-import fs from 'node:fs/promises';
+import fs from 'node:fs';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import pLimit from 'p-limit';
@@ -22,48 +22,18 @@ const concurrency = parseInt(getArg('concurrency', '8'), 10);
 const timeoutMs = parseInt(getArg('timeout', '15000'), 10);
 const dynamicFlag = !!getArg('dynamic', false);
 const dynamicWaitMs = parseInt(getArg('wait', '6000'), 10);
+const cmpFlag = !!getArg('cmp', false);
 
 if (!input) {
-  console.error('Usage: node scanner.mjs --input urls.txt --out results.csv [--concurrency 8] [--timeout 15000] [--dynamic] [--wait 6000]');
+  console.error('Usage: node scanner.mjs --input urls.txt --out results.csv [--concurrency 8] [--timeout 15000] [--dynamic] [--wait 6000] [--cmp]');
   process.exit(1);
 }
 
-// Detection patterns
-const patterns = {
-  google: [
-    /https?:\/\/docs\.google\.com\/forms\/d\/e\/[A-Za-z0-9_-]+\/(?:viewform|formResponse)/i,
-    /<iframe[^>]+src=["']https?:\/\/docs\.google\.com\/forms\/[^"']+["']/i,
-    /<form[^>]+action=["']https?:\/\/docs\.google\.com\/forms\/[^"']+["']/i
-  ],
-  hubspot: [
-    /https?:\/\/js\.hsforms\.net\/forms\/(?:embed\/)?v2\.js/i,
-    /hbspt\.forms\.create\s*\(/i,
-    /https?:\/\/api\.hsforms\.com\/submissions\/v3\/integration\/submit\/\d+\/[0-9a-f-]+/i,
-    /https?:\/\/forms\.hubspot\.com\/uploads\/form\/v2\/\d+\/[0-9a-f-]+/i,
-    /<div[^>]+id=["']hubspotForm["'][^>]*>/i
-  ]
-};
+// Prepare patterns from config (will be loaded in main)
+let patterns = {};
+let cmpPatterns = [];
 
-function detect(html) {
-  const res = { google: false, hubspot: false, evidence: null };
-  const hay = html || '';
-  for (const rx of patterns.google) {
-    const m = hay.match(rx);
-    if (m) { res.google = true; res.evidence = truncate(m[0]); break; }
-  }
-  if (!res.evidence) {
-    for (const rx of patterns.hubspot) {
-      const m = hay.match(rx);
-      if (m) { res.hubspot = true; res.evidence = truncate(m[0]); break; }
-    }
-  } else {
-    // Still check hubspot too
-    for (const rx of patterns.hubspot) {
-      if (hay.match(rx)) { res.hubspot = true; break; }
-    }
-  }
-  return res;
-}
+// Detection functions will be defined in main after config loading
 
 function truncate(s, n = 220) { return s.length > n ? s.slice(0, n) + '…' : s; }
 
@@ -109,6 +79,36 @@ async function fetchDynamic(url) {
     });
     const page = await ctx.newPage();
     const resp = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: timeoutMs });
+
+    // Handle CMP banners if enabled
+    if (cmpFlag && config.cmp.enabled) {
+      try {
+        // Try to find and click common consent buttons
+        const consentSelectors = config.cmp.selectors || [];
+        for (const selector of consentSelectors) {
+          try {
+            const element = await page.$(selector);
+            if (element) {
+              const isVisible = await element.isVisible();
+              if (isVisible) {
+                await element.click();
+                console.log(`Clicked consent button: ${selector}`);
+                await delay(1000); // Wait for consent to be processed
+                break;
+              }
+            }
+          } catch (e) {
+            // Continue to next selector
+          }
+        }
+
+        // Wait a bit more after consent handling
+        await delay(2000);
+      } catch (cmpError) {
+        console.log(`CMP handling failed: ${cmpError.message}`);
+      }
+    }
+
     await delay(dynamicWaitMs);
     const html = await page.content();
     const status = resp ? resp.status() : 0;
@@ -132,12 +132,125 @@ function toCsvRow(values) {
 import * as cheerio from 'cheerio'; // reserved for future selectors if needed
 
 async function main() {
+  // Load configuration
+  let config;
+  try {
+    const configPath = path.resolve(process.cwd(), 'form-detection-config.json');
+    const configContent = await fs.promises.readFile(configPath, 'utf8');
+    config = JSON.parse(configContent);
+  } catch (err) {
+    console.error('Error loading config file:', err.message);
+    console.error('Make sure form-detection-config.json exists in the current directory');
+    process.exit(1);
+  }
+
+  // Prepare patterns from config
+  for (const [formType, formConfig] of Object.entries(config.forms)) {
+    if (formConfig.enabled) {
+      patterns[formType] = formConfig.patterns
+        .filter(p => p.type !== 'url') // URL patterns are handled separately
+        .map(p => new RegExp(p.pattern, 'i'));
+    }
+  }
+
+  // Prepare CMP patterns
+  cmpPatterns = config.cmp.enabled ?
+    config.cmp.patterns.map(p => new RegExp(p.pattern, 'i')) : [];
+
+  // Define detection functions after config is loaded
+  function detectCMP(html) {
+    if (!cmpFlag || !config.cmp.enabled) {
+      return { has_cmp: false, cmp_vendor: null, cmp_evidence: null };
+    }
+
+    const hay = html || '';
+    for (const pattern of config.cmp.patterns) {
+      if (pattern.type === 'url' && hay.includes(pattern.pattern.replace(/\\.*$/, ''))) {
+        return {
+          has_cmp: true,
+          cmp_vendor: pattern.vendor,
+          cmp_evidence: truncate(pattern.description)
+        };
+      } else if (pattern.type !== 'url') {
+        const rx = new RegExp(pattern.pattern, 'i');
+        const match = hay.match(rx);
+        if (match) {
+          return {
+            has_cmp: true,
+            cmp_vendor: pattern.vendor,
+            cmp_evidence: truncate(match[0])
+          };
+        }
+      }
+    }
+
+    return { has_cmp: false, cmp_vendor: null, cmp_evidence: null };
+  }
+
+  function detect(html, url = '') {
+    const result = {
+      detected_types: [],
+      evidence: null,
+      has_cmp: false,
+      cmp_vendor: null,
+      cmp_evidence: null
+    };
+
+    const hay = html || '';
+
+    // Check for forms in enabled config
+    for (const [formType, formConfig] of Object.entries(config.forms)) {
+      if (!formConfig.enabled) continue;
+
+      let formDetected = false;
+
+      // Check URL patterns
+      for (const pattern of formConfig.patterns) {
+        if (pattern.type === 'url') {
+          const rx = new RegExp(pattern.pattern, 'i');
+          if (rx.test(url)) {
+            formDetected = true;
+            result.evidence = truncate(pattern.description);
+            break;
+          }
+        }
+      }
+
+      // Check HTML patterns
+      if (!formDetected) {
+        for (const rx of patterns[formType] || []) {
+          const match = hay.match(rx);
+          if (match) {
+            formDetected = true;
+            result.evidence = truncate(match[0]);
+            break;
+          }
+        }
+      }
+
+      if (formDetected) {
+        result.detected_types.push(formType);
+        result[formType] = true;
+      }
+    }
+
+    // Check for CMP
+    if (cmpFlag) {
+      const cmpResult = detectCMP(hay);
+      result.has_cmp = cmpResult.has_cmp;
+      result.cmp_vendor = cmpResult.cmp_vendor;
+      result.cmp_evidence = cmpResult.cmp_evidence;
+    }
+
+    return result;
+  }
+
   const start = Date.now();
-  const listRaw = await fs.readFile(path.resolve(process.cwd(), input), 'utf8');
+  const listRaw = await fs.promises.readFile(path.resolve(process.cwd(), input), 'utf8');
   const urls = listRaw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const limit = pLimit(concurrency);
 
-  const headers = ['url','method','status','is_google_form','is_hubspot_form','detected_types','evidence','note'];
+  const headers = ['url','method','status','is_google_form','is_hubspot_form','is_microsoft_form','detected_types','evidence','has_cmp','cmp_vendor','cmp_evidence','note'];
   const rows = [toCsvRow(headers)];
   const resultsJson = [];
 
@@ -145,49 +258,54 @@ async function main() {
   const tasks = urls.map(url => limit(async () => {
     const n = ++idx;
     const st = await fetchStatic(url);
-    let det = detect(st.text);
+    let det = detect(st.text, url);
     let method = 'static';
     let note = st.error ? `static_error: ${st.error}` : '';
-    if (!det.google && !det.hubspot && dynamicFlag) {
+    if (det.detected_types.length === 0 && dynamicFlag) {
       const dy = await fetchDynamic(url);
-      const det2 = detect(dy.text);
-      if (det2.google || det2.hubspot) {
+      const det2 = detect(dy.text, url);
+      if (det2.detected_types.length > 0) {
         det = det2;
         method = 'dynamic';
       }
       if (dy.error) note = (note ? note + ' | ' : '') + `dynamic_error: ${dy.error}`;
       if (dy.status) st.status = dy.status;
     }
-    const detectedTypes = [
-      det.google ? 'google_form' : null,
-      det.hubspot ? 'hubspot_form' : null,
-    ].filter(Boolean).join(';');
+    const detectedTypes = det.detected_types.join(';');
     rows.push(toCsvRow([
       url,
       method,
       st.status || 0,
-      det.google,
-      det.hubspot,
+      det.google || false,
+      det.hubspot || false,
+      det.microsoft || false,
       detectedTypes,
       det.evidence || '',
+      det.has_cmp || false,
+      det.cmp_vendor || '',
+      det.cmp_evidence || '',
       note || ''
     ]));
     resultsJson.push({
       url,
       method,
       status: st.status || 0,
-      is_google_form: det.google,
-      is_hubspot_form: det.hubspot,
-      detected_types: detectedTypes ? detectedTypes.split(';') : [],
+      is_google_form: det.google || false,
+      is_hubspot_form: det.hubspot || false,
+      is_microsoft_form: det.microsoft || false,
+      detected_types: det.detected_types,
       evidence: det.evidence,
+      has_cmp: det.has_cmp || false,
+      cmp_vendor: det.cmp_vendor,
+      cmp_evidence: det.cmp_evidence,
       note
     });
     process.stderr.write(`[${n}/${urls.length}] ${url} -> ${detectedTypes || 'none'} (${method}, ${st.status || 0})\n`);
   }));
 
   await Promise.all(tasks);
-  await fs.writeFile(path.resolve(process.cwd(), out), rows.join('\n'), 'utf8');
-  await fs.writeFile(path.resolve(process.cwd(), out.replace(/\.csv$/i, '.json')), JSON.stringify(resultsJson, null, 2), 'utf8');
+  await fs.promises.writeFile(path.resolve(process.cwd(), out), rows.join('\n'), 'utf8');
+  await fs.promises.writeFile(path.resolve(process.cwd(), out.replace(/\.csv$/i, '.json')), JSON.stringify(resultsJson, null, 2), 'utf8');
 
   const dur = ((Date.now() - start)/1000).toFixed(2);
   console.log(`\nSaved CSV to ${out}`);

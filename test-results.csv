@@ -1,0 +1,4 @@
+url,method,status,is_google_form,is_hubspot_form,is_microsoft_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,note
+https://docs.google.com/forms/d/e/1FAIpQLScfV1rJRlLrQ4jG5YLqUQ4jJQW7L8jGQZqJ8J8JQW7L8jGQ/viewform,static,404,true,false,false,google,Google Forms direct URL pattern,false,,,
+https://forms.office.com/r/1234567890,static,200,false,false,true,microsoft,Microsoft Forms short response URL,false,,,
+https://example.com,static,200,false,false,false,,,false,,,
