@@ -7,7 +7,7 @@
 
 Advanced web form scanner detecting Google Forms, HubSpot Forms, Microsoft Forms with comprehensive CMP detection including Cookiebot, OneTrust, Efilli, and GDPR compliance auditing.
 
-![Webform Privacy Consent Scanner](docs/social-preview.png)
+![Webform Privacy Consent Scanner](https://github.com/c3nk/webform-privacy-consent-scanner/raw/main/docs/social-preview.png)
 
 ## 🚀 Quick Start
 
