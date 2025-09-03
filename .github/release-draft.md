@@ -1,4 +1,4 @@
-# v0.1.0 - Initial Release
+# v0.1.1 - Bug Fix Release
 
 ## ✨ Features
 - 🔍 **Multi-Platform Form Detection**: Google Forms, HubSpot Forms, Microsoft Forms
@@ -11,9 +11,13 @@
 - 🎯 **CLI First**: Powerful command-line interface with extensive options
 
 ## 📦 npm Package
-- Published as `webform-privacy-consent-scanner@0.1.0`
+- Published as `webform-privacy-consent-scanner@0.1.1`
 - Install globally: `npm install -g webform-privacy-consent-scanner`
 - Use: `webform-scanner --input urls.txt --cmp`
+
+## 🐛 Bug Fixes
+- Fixed social preview image not displaying on npm package page
+- Updated image link to use GitHub raw URL for proper rendering
 
 ## 🏗️ Installation Examples
 ```bash
