@@ -9,6 +9,7 @@
   "scripts": {
     "scan": "node scanner.mjs --input urls.txt --out results.csv",
     "scan:dynamic": "node scanner.mjs --input urls.txt --out results.csv --dynamic --wait 6000",
+    "filter": "node filter.mjs --input results.json --attr is_hubspot_form --value true",
     "prepare": "node -e \"console.log('Ready')\""
   },
   "dependencies": {

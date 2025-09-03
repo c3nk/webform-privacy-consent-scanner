@@ -67,7 +67,8 @@ test-results/
 playwright-report/
 playwright/.cache/
 
-# Scanner output files
+# Scanner input and output files
+urls.txt
 results.csv
 results.json
 *.ndjson
