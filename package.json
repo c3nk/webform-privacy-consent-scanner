@@ -11,7 +11,7 @@
     "scan:dynamic": "node scanner.mjs --input urls.txt --out results.csv --dynamic --wait 6000",
     "scan:cmp": "node scanner.mjs --input urls.txt --out results.csv --cmp",
     "scan:full": "node scanner.mjs --input urls.txt --out results.csv --dynamic --wait 6000 --cmp",
-    "filter": "node filter.mjs --input results.json --attr is_hubspot_form --value true",
+    "filter": "node filter.mjs --input results.json --attr is_google_form --value true",
     "prepare": "node -e \"console.log('Ready')\""
   },
   "dependencies": {

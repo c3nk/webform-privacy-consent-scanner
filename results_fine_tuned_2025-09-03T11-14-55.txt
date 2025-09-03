@@ -1,0 +1,23 @@
+FILTER REPORT
+=============
+
+Input file: results.json
+Filter: is_google_form = true
+Total results: 4664
+Filtered results: 13
+
+RESULTS:
+--------
+https://hsri.ozyegin.edu.tr/en/design-thinking-in-the-age-of-ai-comparing-traditional-and-ai-assisted-creativity-in-architectural-design
+https://hsri.ozyegin.edu.tr/en/carbon-negative-recycled-concrete-solutions
+https://hsri.ozyegin.edu.tr/en/sustainable-biocemented-3d-printing
+https://www.ozyegin.edu.tr/tr/sektorel-egitim/dersler/sec-101
+https://hsri.ozyegin.edu.tr/yapay-zeka-caginda-tasarim-dusuncesi-mimari-tasarimda-geleneksel-ve-yapay-zeka-destekli-yaraticiligin-karsilastirilmasi
+https://hsri.ozyegin.edu.tr/karbon-negatif-geri-donusturulmus-beton-cozumleri
+https://hsri.ozyegin.edu.tr/surdurulebilir-biyocimentolu-3d-baski
+https://www.ozyegin.edu.tr/tr/ic-mimarlik-ve-cevre-tasarimi/lisans/staj
+https://www.ozyegin.edu.tr/tr/sektorel-egitim-ve-profesyonel-gelisim/sektorel-egitim/dersler/sec-101-universite-yasamina-giris
+https://www.ozyegin.edu.tr/en/sectoral-solutions-courses/courses/sec-101-introduction-university
+https://www.ozyegin.edu.tr/tr/node/8699
+https://www.ozyegin.edu.tr/en/sectoral-education/lessons/sec-101
+https://www.ozyegin.edu.tr/en/interior-architecture-and-environmental-design/undergraduate/internship

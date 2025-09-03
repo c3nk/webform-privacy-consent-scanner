@@ -220,14 +220,18 @@ FILTER REPORT
 Input file: results.json
 Filter: is_google_form = true
 Total results: 4664
-Filtered results: 7
+Filtered results: 13
 
 RESULTS:
 --------
-1. https://example.com/form | status=200 | method=static | types=google
-2. https://another.com/contact | status=200 | method=dynamic | types=google
+https://hsri.ozyegin.edu.tr/en/design-thinking-in-the-age-of-ai-comparing-traditional-and-ai-assisted-creativity-in-architectural-design
+https://hsri.ozyegin.edu.tr/en/carbon-negative-recycled-concrete-solutions
+https://hsri.ozyegin.edu.tr/en/sustainable-biocemented-3d-printing
+https://www.ozyegin.edu.tr/tr/sektorel-egitim/dersler/sec-101
 ...
 ```
+
+**Not:** Rapor dosyası adı otomatik olarak timestamp ile oluşturulur (örn: `results_fine_tuned_2025-09-03T11-14-55.txt`)
 
 ### Özellikler
 

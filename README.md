@@ -186,7 +186,7 @@ After scanning, filter the `results.json` by any attribute-value pair and genera
 
 ```bash
 # Filter by boolean values
-node filter.mjs --attr is_hubspot_form --value true
+node filter.mjs --attr is_google_form --value true
 
 # Filter by status codes
 node filter.mjs --attr status --value 200
@@ -212,10 +212,10 @@ node filter.mjs --input my-results.json --attr method --value dynamic --out cust
 
 ### Output Format
 
-The filter generates a human-readable text report with:
+The filter generates a clean text report with:
 - Summary header (input file, filter criteria, counts)
-- Numbered list of matching results
-- Each line shows: URL, status, method, and detected types
+- Simple list of matching URLs
+- Each line contains only the URL
 
 Example output:
 ```
@@ -223,13 +223,17 @@ FILTER REPORT
 =============
 
 Input file: results.json
-Filter: is_hubspot_form = true
+Filter: is_google_form = true
 Total results: 4664
-Filtered results: 127
+Filtered results: 13
 
 RESULTS:
 --------
-1. https://example.com/form | status=200 | method=static | types=hubspot_form
-2. https://another.com/contact | status=200 | method=dynamic | types=hubspot_form, google_form
+https://hsri.ozyegin.edu.tr/en/design-thinking-in-the-age-of-ai-comparing-traditional-and-ai-assisted-creativity-in-architectural-design
+https://hsri.ozyegin.edu.tr/en/carbon-negative-recycled-concrete-solutions
+https://hsri.ozyegin.edu.tr/en/sustainable-biocemented-3d-printing
+https://www.ozyegin.edu.tr/tr/sektorel-egitim/dersler/sec-101
 ...
 ```
+
+**Note:** Output files include automatic timestamps (e.g., `results_fine_tuned_2025-09-03T11-14-55.txt`)

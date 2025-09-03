@@ -21,7 +21,19 @@ const attr = getArg('attr');
 const valueStr = getArg('value');
 const caseInsensitive = !!getArg('ci', false);
 const contains = !!getArg('contains', false);
-const outputFile = getArg('out', 'results_fine_tuned.txt');
+const outputFile = getArg('out');
+
+// Generate timestamp for output file if not specified
+function generateTimestampedFilename(baseName) {
+  const now = new Date();
+  const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5); // YYYY-MM-DDTHH-MM-SS format
+  const extension = baseName.split('.').pop();
+  const nameWithoutExt = baseName.replace('.' + extension, '');
+  return `${nameWithoutExt}_${timestamp}.${extension}`;
+}
+
+// Determine output filename with timestamp
+const finalOutputFile = outputFile || generateTimestampedFilename('results_fine_tuned.txt');
 
 // Validate required arguments
 if (!attr) {
@@ -126,19 +138,16 @@ async function main() {
       report += `RESULTS:\n`;
       report += `--------\n`;
 
-      filtered.forEach((item, index) => {
-        const typesStr = Array.isArray(item.detected_types)
-          ? item.detected_types.join(', ')
-          : item.detected_types || 'none';
-        report += `${index + 1}. ${item.url} | status=${item.status} | method=${item.method} | types=${typesStr}\n`;
+      filtered.forEach((item) => {
+        report += `${item.url}\n`;
       });
     }
 
     // Write to output file
-    const outputPath = path.resolve(process.cwd(), outputFile);
+    const outputPath = path.resolve(process.cwd(), finalOutputFile);
     await fs.writeFile(outputPath, report, 'utf8');
 
-    console.log(`📄 Report saved to: ${outputFile}`);
+    console.log(`📄 Report saved to: ${finalOutputFile}`);
 
   } catch (error) {
     if (error.code === 'ENOENT') {
