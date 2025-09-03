@@ -1,0 +1,27 @@
+{
+  "name": "form-scanner",
+  "version": "1.1.0",
+  "description": "Scan a list of URLs and detect embedded Google Forms or HubSpot forms (static HTML or optional dynamic rendering).",
+  "type": "module",
+  "bin": {
+    "form-scan": "scanner.mjs"
+  },
+  "scripts": {
+    "scan": "node scanner.mjs --input urls.txt --out results.csv",
+    "scan:dynamic": "node scanner.mjs --input urls.txt --out results.csv --dynamic --wait 6000",
+    "prepare": "node -e \"console.log('Ready')\""
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "p-limit": "^6.1.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.47.0",
+    "eslint": "^9.11.0",
+    "eslint-plugin-import": "^2.29.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
