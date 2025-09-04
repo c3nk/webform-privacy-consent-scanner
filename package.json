@@ -16,21 +16,21 @@
     "url": "https://github.com/c3nk/webform-privacy-consent-scanner/issues"
   },
   "keywords": [
-    "web-scanner",
-    "privacy",
-    "gdpr",
-    "forms",
-    "google-forms",
-    "hubspot-forms",
-    "microsoft-forms",
-    "cmp",
-    "cookiebot",
-    "onetrust",
-    "consent-management",
-    "cli"
+    "privacy","gdpr","cmp","cookiebot","onetrust","efilli",
+    "hubspot","google-forms","microsoft-forms",
+    "webform","scanner","node","cli","playwright"
   ],
   "author": "c3nk.com <me@c3nk.com>",
   "license": "MIT",
+  "files": [
+    "scanner.mjs",
+    "filter.mjs",
+    "bin/",
+    "README.md",
+    "LICENSE",
+    "examples/",
+    "docs/social-preview.png"
+  ],
   "scripts": {
     "start": "node scanner.mjs --help",
     "scan:static": "node scanner.mjs --input examples/urls.sample.txt --out examples/results.sample.csv --cmp",

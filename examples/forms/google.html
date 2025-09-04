@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Test – Google Form (mock/live)</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{font-family:system-ui,Arial;max-width:760px;margin:40px auto;padding:0 16px}
+    iframe{width:100%;height:900px;border:0}
+    code{background:#f5f5f5;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <h1>Google Form – Test</h1>
+  <p>Params: <code>?cmp=cookiebot|onetrust|efilli</code>, <code>&mode=mock|live</code> (default: mock)</p>
+
+  <iframe id="gform" title="Google Form Test" loading="lazy"></iframe>
+
+  <script>
+    (function(){
+      const qs = new URLSearchParams(location.search);
+      const cmp = (qs.get('cmp')||'').toLowerCase();
+      const mode = (qs.get('mode')||'mock').toLowerCase();
+      const head = document.head;
+
+      function addScript(src, attrs = {}, executable = true){
+        const s = document.createElement('script');
+        s.async = false;
+        if (executable) { s.src = src; } else { s.type='application/json'; s.textContent = src; }
+        Object.entries(attrs).forEach(([k,v]) => s.setAttribute(k,v));
+        head.appendChild(s);
+      }
+
+      // Google Forms signature
+      const iframe = document.getElementById('gform');
+      if (mode === 'live') {
+        iframe.src = 'https://docs.google.com/forms/d/e/FORM_ID/viewform?embedded=true';
+      } else {
+        const m = document.createElement('script');
+        m.type = 'application/json';
+        m.textContent = 'https://docs.google.com/forms/d/e/FORM_ID/viewform?embedded=true';
+        iframe.replaceWith(m);
+      }
+
+      // CMP signatures
+      if (cmp === 'cookiebot') {
+        if (mode === 'live') {
+          addScript('https://consent.cookiebot.com/uc.js', { id:'Cookiebot','data-cbid':'00000000-0000-0000-0000-000000000000', type:'text/javascript' });
+        } else {
+          addScript('https://consent.cookiebot.com/uc.js data-cbid=00000000-0000-0000-0000-000000000000', { id:'Cookiebot' }, false);
+        }
+      } else if (cmp === 'onetrust') {
+        if (mode === 'live') {
+          addScript('https://cdn.cookielaw.org/scripttemplates/otSDKStub.js', { 'data-domain-script':'11111111-1111-1111-1111-111111111111', charset:'UTF-8' });
+          window.OptanonWrapper = function(){};
+        } else {
+          addScript('https://cdn.cookielaw.org/scripttemplates/otSDKStub.js data-domain-script=11111111-1111-1111-1111-111111111111', {}, false);
+          const ot = document.createElement('script'); ot.type='application/json'; ot.textContent='OptanonWrapper()'; head.appendChild(ot);
+        }
+      } else if (cmp === 'efilli') {
+        if (mode === 'live') {
+          addScript('https://cdn.efilli.com/efilli.js', { 'data-efilli-id':'EFILLI-DEMO-ID' });
+        } else {
+          addScript('https://cdn.efilli.com/efilli.js data-efilli-id=EFILLI-DEMO-ID', {}, false);
+        }
+      }
+    })();
+  </script>
+
+<footer>
+  <p>
+      <a href="https://www.linkedin.com/in/cenkkabahasanoglu/" target="_blank">LinkedIn</a>
+      <a href="https://www.instagram.com/cenxanane/" target="_blank">Instagram</a>
+      <a href="https://x.com/cenxanane" target="_blank">X</a>
+  </p>
+  Made with <span style="color: #e25555;">&#9829;</span> in Istanbul
+</footer>
+
+</body>
+</html>

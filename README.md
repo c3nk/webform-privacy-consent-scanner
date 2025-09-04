@@ -7,7 +7,7 @@
 
 Advanced web form scanner detecting Google Forms, HubSpot Forms, Microsoft Forms with comprehensive CMP detection including Cookiebot, OneTrust, Efilli, and GDPR compliance auditing.
 
-![Webform Privacy Consent Scanner](https://github.com/c3nk/webform-privacy-consent-scanner/raw/main/docs/social-preview.png)
+![Webform Privacy Consent Scanner — detects Google/HubSpot/Microsoft forms and CMPs (Cookiebot, OneTrust, Efilli)](docs/social-preview.png)
 
 ## 🚀 Quick Start
 
@@ -18,8 +18,8 @@ npm install -g webform-privacy-consent-scanner
 # Basic scan with CMP detection
 webform-scanner --input urls.txt --out results.csv --cmp
 
-# Full scan with dynamic rendering
-webform-scanner --input urls.txt --dynamic --cmp --wait 8000
+# Full scan with dynamic rendering (default wait: 6000ms)
+webform-scanner --input urls.txt --dynamic --cmp
 ```
 
 ## 📋 Table of Contents
@@ -123,29 +123,26 @@ node filter.mjs --attr url --value example.com --ci --contains
 
 ### CSV Format
 ```csv
-url,has_google_forms,has_hubspot_forms,has_ms_forms,cmp_vendor,notes
-https://c3nk.com/,false,false,false,none,"static scan; no patterns found"
-https://example.com,dynamic,200,false,true,false,hubspot,"HubSpot forms script",true,Cookiebot,cookiebot
+url,method,status,is_google_form,is_hubspot_form,is_microsoft_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,note
+https://c3nk.com/,static,200,false,false,false,[],,false,,,
 ```
 
 ### JSON Format
 ```json
-[
-  {
-    "url": "https://c3nk.com/",
-    "method": "static",
-    "status": 200,
-    "is_google_form": true,
-    "is_hubspot_form": false,
-    "is_microsoft_form": false,
-    "detected_types": ["google"],
-    "evidence": "Google Forms direct URL pattern",
-    "has_cmp": false,
-    "cmp_vendor": null,
-    "cmp_evidence": null,
-    "note": ""
-  }
-]
+{
+  "url": "https://c3nk.com/",
+  "method": "static",
+  "status": 200,
+  "is_google_form": false,
+  "is_hubspot_form": false,
+  "is_microsoft_form": false,
+  "detected_types": [],
+  "evidence": null,
+  "has_cmp": false,
+  "cmp_vendor": "",
+  "cmp_evidence": "",
+  "note": ""
+}
 ```
 
 ### Filtered Text Report
@@ -174,10 +171,21 @@ https://example.com/form
 | `--concurrency <n>` | Number of concurrent requests | `8` |
 | `--timeout <ms>` | Request timeout | `15000` |
 | `--dynamic` | Enable dynamic scanning | `false` |
-| `--wait <ms>` | Wait time for dynamic content | `6000` |
+| `--wait <ms>` | Wait time for dynamic content (default: 6000ms) | `6000` |
 | `--cmp` | Enable CMP detection | `false` |
 
 ## 📈 Examples
+
+### Live test pages (hosted on c3nk.com)
+- HubSpot + Cookiebot (mock signatures): https://www.c3nk.com/examples/forms/hubspot.html?cmp=cookiebot&mode=mock
+- Google + OneTrust (mock signatures): https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock
+- Microsoft + Efilli (mock signatures): https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock
+
+> **mock mode** embeds only detection signatures (no third‑party requests).
+> Use `&mode=live` to actually load vendor scripts for visual checks.
+
+### Local examples (in this repo)
+We ship three mock pages under `examples/forms/` with the same signature logic.
 
 ### 1. Basic Website Audit
 ```bash
@@ -262,7 +270,7 @@ npm install -g webform-privacy-consent-scanner
 # Temel tarama
 webform-scanner --input urls.txt --cmp
 
-# Tam tarama (dinamik)
+# Tam tarama (dinamik, varsayılan bekleme: 6000ms)
 webform-scanner --input urls.txt --dynamic --cmp
 ```
 
