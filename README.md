@@ -124,25 +124,43 @@ node filter.mjs --attr url --value example.com --ci --contains
 ### CSV Format
 ```csv
 url,method,status,is_google_form,is_hubspot_form,is_microsoft_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,note
-https://c3nk.com/,static,200,false,false,false,[],,false,,,
+https://www.c3nk.com/examples/forms/hubspot.html?cmp=cookiebot&mode=mock,dynamic,200,false,true,false,["hubspot"],"hbspt.forms.create(",true,"Cookiebot","Cookiebot",
+https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock,dynamic,200,true,false,false,["google"],"docs.google.com/forms",true,"Cookiebot","cookiebot",
+https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock,dynamic,200,false,false,true,["microsoft"],"forms.office.com",true,"Cookiebot","cookiebot",
 ```
 
 ### JSON Format
 ```json
-{
-  "url": "https://c3nk.com/",
-  "method": "static",
-  "status": 200,
-  "is_google_form": false,
-  "is_hubspot_form": false,
-  "is_microsoft_form": false,
-  "detected_types": [],
-  "evidence": null,
-  "has_cmp": false,
-  "cmp_vendor": "",
-  "cmp_evidence": "",
-  "note": ""
-}
+[
+  {
+    "url": "https://www.c3nk.com/examples/forms/hubspot.html?cmp=cookiebot&mode=mock",
+    "method": "dynamic",
+    "status": 200,
+    "is_google_form": false,
+    "is_hubspot_form": true,
+    "is_microsoft_form": false,
+    "detected_types": ["hubspot"],
+    "evidence": "hbspt.forms.create(",
+    "has_cmp": true,
+    "cmp_vendor": "Cookiebot",
+    "cmp_evidence": "Cookiebot",
+    "note": ""
+  },
+  {
+    "url": "https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock",
+    "method": "dynamic",
+    "status": 200,
+    "is_google_form": true,
+    "is_hubspot_form": false,
+    "is_microsoft_form": false,
+    "detected_types": ["google"],
+    "evidence": "docs.google.com/forms",
+    "has_cmp": true,
+    "cmp_vendor": "Cookiebot",
+    "cmp_evidence": "cookiebot",
+    "note": ""
+  }
+]
 ```
 
 ### Filtered Text Report
@@ -150,16 +168,14 @@ https://c3nk.com/,static,200,false,false,false,[],,false,,,
 FILTER REPORT
 =============
 
-Input file: results.json
+Input file: test-results.json
 Filter: is_google_form = true
-Total results: 1000
-Filtered results: 15
+Total results: 11
+Filtered results: 1
 
 RESULTS:
 --------
-https://c3nk.com/contact
-https://example.com/form
-...
+https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock
 ```
 
 ## 🔧 CLI Options

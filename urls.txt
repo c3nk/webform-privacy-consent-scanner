@@ -1,18 +1,13 @@
-https://www.ozyegin.edu.tr/tr
-https://aday.ozyegin.edu.tr/
-https://aday.ozyegin.edu.tr/ozyegin-universitesi-oncu-yapay-zeka-girisimi-kapsaminda-50-tam-zamanli-100-misafir-ogretim-uyesi-istihdam-edecek
-https://aday.ozyegin.edu.tr/isletme-fakultesi
-https://aday.ozyegin.edu.tr/muhendislik-fakultesi
-https://aday.ozyegin.edu.tr/sosyal-bilimler-fakultesi
-https://aday.ozyegin.edu.tr/havacilik-ve-uzay-bilimleri-fakultesi
-https://aday.ozyegin.edu.tr/hukuk-fakultesi
-https://aday.ozyegin.edu.tr/mimarlik-ve-tasarim-fakultesi
-https://aday.ozyegin.edu.tr/uygulamali-bilimler-fakultesi
-https://aday.ozyegin.edu.tr/yabanci-diller-yuksekokulu
-https://aday.ozyegin.edu.tr/burslar
-https://aday.ozyegin.edu.tr/ucretler
-https://aday.ozyegin.edu.tr/taban-puanlari-ve-kontenjanlar
-https://aday.ozyegin.edu.tr/bize-sorun
-https://aday.ozyegin.edu.tr/brosur-talep-formu
-https://aday.ozyegin.edu.tr/kampus-ziyaret-formu
-https://aday.ozyegin.edu.tr/ozel-etkinlik-habercisi-formu
+# c3nk.com test pages (live examples)
+https://www.c3nk.com/examples/forms/hubspot.html?cmp=cookiebot&mode=mock
+https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock
+https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock
+
+# Local mock examples (for development testing)
+examples/forms/hubspot.html?cmp=cookiebot&mode=mock
+examples/forms/google.html?cmp=onetrust&mode=mock
+examples/forms/microsoft.html?cmp=efilli&mode=mock
+
+# Additional test URLs
+https://www.c3nk.com/
+https://github.com/c3nk/webform-privacy-consent-scanner
