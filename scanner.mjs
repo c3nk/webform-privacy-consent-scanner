@@ -374,7 +374,8 @@ async function main() {
       collectors_detected: false,
       collector_link_count: 0,
       collector_embed_count: 0,
-      collectors: []
+      collectors: [],
+      linked_forms: []
     };
 
     const hay = html || '';
@@ -508,6 +509,77 @@ async function main() {
     }
   }
 
+  // Form link detection
+  if (config.forms) {
+    // Extract all links from the page
+    const linkRegex = /<a[^>]+href=["']([^"']+)["'][^>]*>([^<]*)<\/a>/gi;
+    let match;
+    const foundLinks = new Set(); // Deduplication
+
+    while ((match = linkRegex.exec(hay)) !== null) {
+      const href = match[1];
+      const linkText = match[2] || '';
+
+      if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:')) continue;
+
+      // Normalize URL
+      const baseUrl = new URL(url);
+      let absoluteUrl;
+      try {
+        absoluteUrl = new URL(href, baseUrl);
+      } catch (e) {
+        continue; // Invalid URL
+      }
+
+      const fullUrl = absoluteUrl.href;
+
+      // Skip if already processed
+      if (foundLinks.has(fullUrl)) continue;
+      foundLinks.add(fullUrl);
+
+      // Check if this link matches any form pattern
+      for (const [formType, formConfig] of Object.entries(config.forms)) {
+        if (!formConfig.enabled) continue;
+
+        let isFormLink = false;
+        let linkEvidence = '';
+
+        // Check URL patterns
+        for (const pattern of formConfig.patterns) {
+          if (pattern.type === 'url') {
+            const rx = new RegExp(pattern.pattern, 'i');
+            if (rx.test(fullUrl)) {
+              isFormLink = true;
+              linkEvidence = pattern.description;
+              break;
+            }
+          }
+        }
+
+        if (isFormLink) {
+          result.linked_forms.push({
+            url: fullUrl,
+            form_type: formType,
+            evidence: truncate(linkEvidence),
+            link_text: truncate(linkText, 50),
+            context: extractContext(hay, match[0])
+          });
+          break; // Only add to first matching form type
+        }
+      }
+    }
+
+    // Debug logging for linked forms
+    if (result.linked_forms.length > 0) {
+      console.log(`🔗 Found ${result.linked_forms.length} form links on ${url}`);
+      if (globalThis.process?.env?.VERBOSE) {
+        result.linked_forms.forEach(link => {
+          console.log(`  → ${link.form_type}: ${link.url} (${link.link_text})`);
+        });
+      }
+    }
+  }
+
   return result;
   }
 
@@ -516,7 +588,7 @@ async function main() {
   const urls = listRaw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const limit = pLimit(concurrency);
 
-  const headers = ['url','method','status','is_google_form','is_hubspot_form','is_microsoft_form','detected_types','evidence','has_cmp','cmp_vendor','cmp_evidence','collectors_detected','collector_link_count','collector_embed_count','note'];
+  const headers = ['url','method','status','is_ozyegin_form','is_yourcompany_form','is_example_form','is_google_form','is_hubspot_form','is_microsoft_form','is_formstack_form','detected_types','evidence','has_cmp','cmp_vendor','cmp_evidence','collectors_detected','collector_link_count','collector_embed_count','linked_forms_detected','linked_forms_count','note'];
   const rows = [toCsvRow(headers)];
   const resultsJson = [];
 
@@ -551,9 +623,13 @@ async function main() {
       url,
       method,
       st.status || 0,
+      det.ozyegin || false,
+      det.yourcompany || false,
+      det.example || false,
       det.google || false,
       det.hubspot || false,
       det.microsoft || false,
+      det.formstack || false,
       detectedTypes,
       det.evidence || '',
       det.has_cmp || false,
@@ -562,15 +638,21 @@ async function main() {
       det.collectors_detected || false,
       det.collector_link_count || 0,
       det.collector_embed_count || 0,
+      (det.linked_forms && det.linked_forms.length > 0) || false,
+      (det.linked_forms && det.linked_forms.length) || 0,
       note || ''
     ]));
     resultsJson.push({
       url,
       method,
       status: st.status || 0,
+      is_ozyegin_form: det.ozyegin || false,
+      is_yourcompany_form: det.yourcompany || false,
+      is_example_form: det.example || false,
       is_google_form: det.google || false,
       is_hubspot_form: det.hubspot || false,
       is_microsoft_form: det.microsoft || false,
+      is_formstack_form: det.formstack || false,
       detected_types: det.detected_types,
       evidence: det.evidence,
       has_cmp: det.has_cmp || false,
@@ -580,6 +662,9 @@ async function main() {
       collector_link_count: det.collector_link_count || 0,
       collector_embed_count: det.collector_embed_count || 0,
       collectors: det.collectors || [],
+      linked_forms_detected: (det.linked_forms && det.linked_forms.length > 0) || false,
+      linked_forms_count: (det.linked_forms && det.linked_forms.length) || 0,
+      linked_forms: det.linked_forms || [],
       note
     });
     process.stderr.write(`[${n}/${urls.length}] ${url} -> ${detectedTypes || 'none'} (${method}, ${st.status || 0})\n`);

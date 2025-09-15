@@ -13,10 +13,11 @@
 
 ## Giriş
 
-Form Scanner, web sitelerinde Google Forms, HubSpot Forms, Microsoft Forms ve diğer form türlerini tespit etmek için tasarlanmış güçlü bir CLI aracıdır. Ayrıca Cookie Consent Management Platform (CMP) detection özelliği ile çerez onay bannerlarını da tespit edebilir.
+Form Scanner, web sitelerinde Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms, Özyeğin Üniversitesi Forms ve diğer form türlerini tespit etmek için tasarlanmış güçlü bir CLI aracıdır. Ayrıca 3. parti uygulama linklerini tespit edebilir ve Cookie Consent Management Platform (CMP) detection özelliği ile çerez onay bannerlarını da tespit edebilir.
 
 ### Temel Özellikler
-- ✅ Google Forms, HubSpot Forms, Microsoft Forms tespiti
+- ✅ Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms, Özyeğin Üniversitesi Forms tespiti
+- ✅ 3. parti uygulama link tespiti
 - ✅ Cookie Consent Management Platform detection
 - ✅ Statik ve dinamik tarama modları
 - ✅ Yüksek performanslı eşzamanlı tarama
@@ -112,7 +113,7 @@ node scanner.mjs --input urls.txt --timeout 30000
 
 ### CSV Formatı
 ```csv
-url,method,status,is_google_form,is_hubspot_form,is_microsoft_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,note
+url,method,status,is_ozyegin_form,is_yourcompany_form,is_example_form,is_google_form,is_hubspot_form,is_microsoft_form,is_formstack_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,collectors_detected,collector_link_count,collector_embed_count,linked_forms_detected,linked_forms_count,note
 https://example.com,static,200,true,false,false,google,"Google Forms direct URL pattern",false,,,
 https://site.com,dynamic,200,false,true,false,hubspot,"HubSpot forms script",true,Efilli,efilli,
 ```

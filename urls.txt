@@ -2,6 +2,8 @@
 https://www.c3nk.com/examples/forms/hubspot.html?cmp=cookiebot&mode=mock
 https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock
 https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock
+https://www.c3nk.com/examples/forms/to-the-3rd-party-app.html
+https://www.c3nk.com/examples/forms/microsoft.html
 
 # Local mock examples (for development testing)
 examples/forms/hubspot.html?cmp=cookiebot&mode=mock

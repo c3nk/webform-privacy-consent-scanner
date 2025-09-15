@@ -1,6 +1,74 @@
 {
   "version": "1.0.0",
   "forms": {
+    "yourcompany": {
+      "name": "Your Company Forms",
+      "enabled": true,
+      "patterns": [
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/forms\\.yourcompany\\.com\\/[a-z0-9_-]+",
+          "description": "Your Company hosted form URL"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/yourcompany\\.com\\/contact\\/form\\/[a-z0-9_-]+",
+          "description": "Your Company contact form URL"
+        },
+        {
+          "type": "html",
+          "pattern": "<iframe[^>]+src=[\"']https?:\\/\\/forms\\.yourcompany\\.com\\/[^\"']+[\"']",
+          "description": "Your Company form iframe embed"
+        },
+        {
+          "type": "html",
+          "pattern": "<form[^>]+action=[\"']https?:\\/\\/forms\\.yourcompany\\.com\\/[^\"']+[\"']",
+          "description": "Your Company form action"
+        }
+      ]
+    },
+    "ozyegin": {
+      "name": "Özyeğin University Forms",
+      "enabled": true,
+      "patterns": [
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/[a-z0-9_-]*",
+          "description": "Özyeğin University form URL"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/.*",
+          "description": "Özyeğin University form with path"
+        },
+        {
+          "type": "html",
+          "pattern": "<iframe[^>]+src=[\"']https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/[^\"']*[\"']",
+          "description": "Özyeğin University form iframe embed"
+        },
+        {
+          "type": "html",
+          "pattern": "<form[^>]+action=[\"']https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/[^\"']*[\"']",
+          "description": "Özyeğin University form action"
+        }
+      ]
+    },
+    "example": {
+      "name": "Example Custom Form",
+      "enabled": false,
+      "patterns": [
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/forms\\.example\\.com\\/[a-z0-9_-]+",
+          "description": "Example custom form URL"
+        },
+        {
+          "type": "html",
+          "pattern": "example-form-[a-z0-9_-]+",
+          "description": "Example form ID in HTML"
+        }
+      ]
+    },
     "google": {
       "name": "Google Forms",
       "enabled": true,
@@ -86,6 +154,21 @@
           "type": "url",
           "pattern": "https?:\\/\\/formstack\\.com\\/forms\\/[a-z0-9_-]+",
           "description": "Formstack direct form URL"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/[a-z0-9-]+\\.formstack\\.com\\/forms\\/[a-z0-9_-]+\\/view",
+          "description": "Formstack form view URL"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/[a-z0-9-]+\\.formstack\\.com\\/forms\\/[a-z0-9_-]+\\/embed",
+          "description": "Formstack embedded form URL"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/formstack\\.com\\/forms\\/[a-z0-9_-]+\\/preview",
+          "description": "Formstack form preview URL"
         },
         {
           "type": "script",
@@ -275,7 +358,7 @@
     "description": "Form detection, CMP patterns, and collector patterns configuration",
     "last_updated": "2024-12-19",
     "author": "form-scanner",
-    "supported_forms": ["google", "hubspot", "microsoft", "formstack"],
+    "supported_forms": ["ozyegin", "yourcompany", "example", "google", "hubspot", "microsoft", "formstack"],
     "supported_cmp_vendors": ["Cookiebot", "OneTrust", "Cookie Consent", "Efilli", "Google Tag Manager", "Generic"],
     "supported_collectors": ["Custom glob patterns for link/iframe/script/form-action detection"]
   }

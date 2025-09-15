@@ -5,7 +5,7 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
 [![npm version](https://img.shields.io/npm/v/webform-privacy-consent-scanner)](https://www.npmjs.com/package/webform-privacy-consent-scanner)
 
-Advanced web form scanner detecting Google Forms, HubSpot Forms, Microsoft Forms with comprehensive CMP detection including Cookiebot, OneTrust, Efilli, and GDPR compliance auditing.
+Advanced web form scanner detecting Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms with comprehensive CMP detection including Cookiebot, OneTrust, Efilli, and GDPR compliance auditing. Also detects 3rd party application links and embedded forms on websites.
 
 ![Webform Privacy Consent Scanner — detects Google/HubSpot/Microsoft forms and CMPs (Cookiebot, OneTrust, Efilli)](docs/social-preview.png)
 
@@ -36,7 +36,8 @@ webform-scanner --input urls.txt --dynamic --cmp
 
 ## ✨ Features
 
-- 🔍 **Multi-Platform Form Detection**: Google Forms, HubSpot Forms, Microsoft Forms
+- 🔍 **Multi-Platform Form Detection**: Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms, Özyeğin University Forms
+- 🔗 **3rd Party Application Link Detection**: Detects links to external applications and forms on websites
 - 🍪 **Comprehensive CMP Detection**: Cookiebot, OneTrust, Efilli, GTM, Generic GDPR
 - 🌐 **Advanced Scanning**: Static HTML + optional Playwright dynamic rendering
 - 🔄 **Smart Fallback**: Automatic curl fallback for blocked requests
@@ -127,7 +128,7 @@ node filter.mjs --attr url --value example.com --ci --contains
 
 ### CSV Format
 ```csv
-url,method,status,is_google_form,is_hubspot_form,is_microsoft_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,collectors_detected,collector_link_count,collector_embed_count,note
+url,method,status,is_ozyegin_form,is_yourcompany_form,is_example_form,is_google_form,is_hubspot_form,is_microsoft_form,is_formstack_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,collectors_detected,collector_link_count,collector_embed_count,linked_forms_detected,linked_forms_count,note
 https://www.c3nk.com/examples/forms/hubspot.html?cmp=cookiebot&mode=mock,dynamic,200,false,true,false,["hubspot"],"hbspt.forms.create(",true,"Cookiebot","Cookiebot",true,2,1,
 https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock,dynamic,200,true,false,false,["google"],"docs.google.com/forms",true,"Cookiebot","cookiebot",false,0,0,
 https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock,dynamic,200,false,false,true,["microsoft"],"forms.office.com",true,"Cookiebot","cookiebot",true,1,1,
