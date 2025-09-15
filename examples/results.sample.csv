@@ -1,7 +1,0 @@
-url,has_google_forms,has_hubspot_forms,has_ms_forms,cmp_vendor,notes
-https://c3nk.com/,false,false,false,none,"static scan; no patterns found"
-
-Scan Summary
-------------
-Target count: 1
-- https://c3nk.com/ : no known webform or CMP signatures found (static)
