@@ -91,6 +91,9 @@ webform-scanner --input large-list.txt --concurrency 16 --timeout 20000
 
 # Custom output location
 webform-scanner --input urls.txt --out my-scan-results.csv
+
+# Collector pattern detection (DOM analysis)
+webform-scanner --input urls.txt --collectors "form.ozyegin.edu.tr/*,yourbrand.formstack.com/*" --cmp
 ```
 
 ### Filtering Results
@@ -111,6 +114,7 @@ node filter.mjs --attr url --value example.com --ci --contains
 - **Google Forms**: Direct URLs, embedded iframes, form actions
 - **HubSpot Forms**: Script detection, API endpoints, inline JavaScript
 - **Microsoft Forms**: Response pages, short URLs, Office UI framework
+- **Formstack Forms**: Hosted forms, embed scripts, iframe integration
 
 ### CMP Platforms
 - **Cookiebot**: Popular EU CMP solution
@@ -123,10 +127,10 @@ node filter.mjs --attr url --value example.com --ci --contains
 
 ### CSV Format
 ```csv
-url,method,status,is_google_form,is_hubspot_form,is_microsoft_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,note
-https://www.c3nk.com/examples/forms/hubspot.html?cmp=cookiebot&mode=mock,dynamic,200,false,true,false,["hubspot"],"hbspt.forms.create(",true,"Cookiebot","Cookiebot",
-https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock,dynamic,200,true,false,false,["google"],"docs.google.com/forms",true,"Cookiebot","cookiebot",
-https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock,dynamic,200,false,false,true,["microsoft"],"forms.office.com",true,"Cookiebot","cookiebot",
+url,method,status,is_google_form,is_hubspot_form,is_microsoft_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,collectors_detected,collector_link_count,collector_embed_count,note
+https://www.c3nk.com/examples/forms/hubspot.html?cmp=cookiebot&mode=mock,dynamic,200,false,true,false,["hubspot"],"hbspt.forms.create(",true,"Cookiebot","Cookiebot",true,2,1,
+https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock,dynamic,200,true,false,false,["google"],"docs.google.com/forms",true,"Cookiebot","cookiebot",false,0,0,
+https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock,dynamic,200,false,false,true,["microsoft"],"forms.office.com",true,"Cookiebot","cookiebot",true,1,1,
 ```
 
 ### JSON Format
@@ -144,6 +148,18 @@ https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock,dynamic,
     "has_cmp": true,
     "cmp_vendor": "Cookiebot",
     "cmp_evidence": "Cookiebot",
+    "collectors_detected": true,
+    "collector_link_count": 2,
+    "collector_embed_count": 1,
+    "collectors": [
+      {
+        "target_pattern": "form.ozyegin.edu.tr/*",
+        "matched_url": "https://form.ozyegin.edu.tr/contact",
+        "relation": "link",
+        "match_type": "wildcard",
+        "text_or_context": "Contact us for more information"
+      }
+    ],
     "note": ""
   },
   {
@@ -158,6 +174,10 @@ https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock,dynamic,
     "has_cmp": true,
     "cmp_vendor": "Cookiebot",
     "cmp_evidence": "cookiebot",
+    "collectors_detected": false,
+    "collector_link_count": 0,
+    "collector_embed_count": 0,
+    "collectors": [],
     "note": ""
   }
 ]
@@ -189,6 +209,7 @@ https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock
 | `--dynamic` | Enable dynamic scanning | `false` |
 | `--wait <ms>` | Wait time for dynamic content (default: 6000ms) | `6000` |
 | `--cmp` | Enable CMP detection | `false` |
+| `--collectors <patterns>` | Comma-separated glob patterns for link/iframe/script detection | None |
 
 ## 📈 Examples
 
@@ -219,7 +240,19 @@ webform-scanner --input company-websites.txt --concurrency 20 --cmp --dynamic
 webform-scanner --input eu-websites.txt --cmp --out gdpr-audit.csv
 ```
 
-### 4. Development Testing
+### 4. Collector Pattern Detection
+```bash
+# Detect links to university forms
+webform-scanner --input urls.txt --collectors "form.ozyegin.edu.tr/*,forms.boun.edu.tr/*"
+
+# Combine with form detection and CMP
+webform-scanner --input urls.txt --collectors "*.formstack.com/forms/*" --cmp --dynamic
+
+# Multiple patterns for comprehensive analysis
+webform-scanner --input company-sites.txt --collectors "contact.example.com/*,forms.example.com/*,apply.example.com/*"
+```
+
+### 5. Development Testing
 ```bash
 npm run scan:static  # Uses examples/urls.sample.txt
 npm run scan:full    # Dynamic scanning with examples
