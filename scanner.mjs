@@ -516,7 +516,7 @@ async function main() {
   const urls = listRaw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const limit = pLimit(concurrency);
 
-  const headers = ['url','method','status','is_google_form','is_hubspot_form','is_microsoft_form','detected_types','evidence','has_cmp','cmp_vendor','cmp_evidence','note'];
+  const headers = ['url','method','status','is_google_form','is_hubspot_form','is_microsoft_form','detected_types','evidence','has_cmp','cmp_vendor','cmp_evidence','collectors_detected','collector_link_count','collector_embed_count','note'];
   const rows = [toCsvRow(headers)];
   const resultsJson = [];
 
@@ -559,6 +559,9 @@ async function main() {
       det.has_cmp || false,
       det.cmp_vendor || '',
       det.cmp_evidence || '',
+      det.collectors_detected || false,
+      det.collector_link_count || 0,
+      det.collector_embed_count || 0,
       note || ''
     ]));
     resultsJson.push({
@@ -573,6 +576,10 @@ async function main() {
       has_cmp: det.has_cmp || false,
       cmp_vendor: det.cmp_vendor,
       cmp_evidence: det.cmp_evidence,
+      collectors_detected: det.collectors_detected || false,
+      collector_link_count: det.collector_link_count || 0,
+      collector_embed_count: det.collector_embed_count || 0,
+      collectors: det.collectors || [],
       note
     });
     process.stderr.write(`[${n}/${urls.length}] ${url} -> ${detectedTypes || 'none'} (${method}, ${st.status || 0})\n`);
