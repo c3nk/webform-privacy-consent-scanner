@@ -1,6 +1,6 @@
 {
   "name": "webform-privacy-consent-scanner",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Advanced web form scanner detecting Google Forms, HubSpot Forms, Microsoft Forms with comprehensive CMP detection including Cookiebot, OneTrust, Efilli, and GDPR compliance auditing.",
   "main": "scanner.mjs",
   "type": "module",
