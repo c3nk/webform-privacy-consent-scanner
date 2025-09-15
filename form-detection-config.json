@@ -266,7 +266,7 @@
     "name": "Collector Patterns",
     "enabled": true,
     "patterns": [
-      "form.ozyegin.edu.tr/*",
+      "forms.example.com/*",
       "yourbrand.formstack.com/*"
     ],
     "include_subdomains": false

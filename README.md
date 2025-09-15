@@ -93,7 +93,7 @@ webform-scanner --input large-list.txt --concurrency 16 --timeout 20000
 webform-scanner --input urls.txt --out my-scan-results.csv
 
 # Collector pattern detection (DOM analysis)
-webform-scanner --input urls.txt --collectors "form.ozyegin.edu.tr/*,yourbrand.formstack.com/*" --cmp
+webform-scanner --input urls.txt --collectors "forms.example.com/*,yourbrand.formstack.com/*" --cmp
 ```
 
 ### Filtering Results
@@ -153,8 +153,8 @@ https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock,dynamic,
     "collector_embed_count": 1,
     "collectors": [
       {
-        "target_pattern": "form.ozyegin.edu.tr/*",
-        "matched_url": "https://form.ozyegin.edu.tr/contact",
+        "target_pattern": "forms.example.com/*",
+        "matched_url": "https://forms.example.com/contact",
         "relation": "link",
         "match_type": "wildcard",
         "text_or_context": "Contact us for more information"
@@ -242,8 +242,8 @@ webform-scanner --input eu-websites.txt --cmp --out gdpr-audit.csv
 
 ### 4. Collector Pattern Detection
 ```bash
-# Detect links to university forms
-webform-scanner --input urls.txt --collectors "form.ozyegin.edu.tr/*,forms.boun.edu.tr/*"
+# Detect links to specific forms
+webform-scanner --input urls.txt --collectors "forms.example.com/*,yourbrand.formstack.com/*"
 
 # Combine with form detection and CMP
 webform-scanner --input urls.txt --collectors "*.formstack.com/forms/*" --cmp --dynamic

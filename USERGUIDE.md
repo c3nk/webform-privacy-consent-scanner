@@ -184,8 +184,8 @@ node filter.mjs --attr detected_types --value hubspot --ci --contains
 
 #### Contains (İçeren) Arama
 ```bash
-# URL'de "university" kelimesi geçenleri bul
-node filter.mjs --attr url --value university --contains --ci
+# URL'de "example" kelimesi geçenleri bul
+node filter.mjs --attr url --value example --contains --ci
 ```
 
 #### Farklı Input/Output Dosyaları
@@ -224,10 +224,10 @@ Filtered results: 13
 
 RESULTS:
 --------
-https://hsri.ozyegin.edu.tr/en/design-thinking-in-the-age-of-ai-comparing-traditional-and-ai-assisted-creativity-in-architectural-design
-https://hsri.ozyegin.edu.tr/en/carbon-negative-recycled-concrete-solutions
-https://hsri.ozyegin.edu.tr/en/sustainable-biocemented-3d-printing
-https://www.ozyegin.edu.tr/tr/sektorel-egitim/dersler/sec-101
+https://research.example.com/design-thinking-ai
+https://research.example.com/carbon-negative-concrete
+https://research.example.com/sustainable-3d-printing
+https://www.example.com/training/courses/sec-101
 ...
 ```
 
@@ -290,7 +290,7 @@ STATIC_FETCH_ERROR for https://example.com: fetch failed, trying curl fallback..
 **Belirti:**
 - Static modda "fetch failed" hatası
 - HubSpot formları tespit edilemiyor
-- Özellikle anti-bot koruması olan sitelerde (örn. `https://sea.ozyegin.edu.tr/`)
+- Özellikle anti-bot koruması olan sitelerde (örn. `https://secure.example.com/`)
 
 **Neden:**
 - Node.js'in fetch API'si bazı web siteleri tarafından engelleniyor
@@ -305,9 +305,9 @@ Scanner otomatik olarak curl fallback mekanizmasını kullanır:
 
 **Başarılı fallback örneği:**
 ```
-STATIC_FETCH_ERROR for https://sea.ozyegin.edu.tr/: fetch failed, trying curl fallback...
-CURL_FALLBACK_SUCCESS for https://sea.ozyegin.edu.tr/: 58200 bytes
-[1/1] https://sea.ozyegin.edu.tr/ -> hubspot (static, 200)
+STATIC_FETCH_ERROR for https://secure.example.com/: fetch failed, trying curl fallback...
+CURL_FALLBACK_SUCCESS for https://secure.example.com/: 58200 bytes
+[1/1] https://secure.example.com/ -> hubspot (static, 200)
 ```
 
 **Gereksinimler:**
@@ -364,8 +364,8 @@ node filter.mjs --attr is_google_form --value true --input results.json
 # Başarılı istekleri listele
 node filter.mjs --attr status --value 200
 
-# URL'de "edu" içeren üniversite sitelerini bul
-node filter.mjs --attr url --value edu --contains --ci
+# URL'de "example" içeren siteleri bul
+node filter.mjs --attr url --value example --contains --ci
 
 # CMP tespit edilen siteleri listele
 node filter.mjs --attr has_cmp --value true

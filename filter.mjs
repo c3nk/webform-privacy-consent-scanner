@@ -42,7 +42,7 @@ if (!attr) {
   console.error('  node filter.mjs --attr is_hubspot_form --value true');
   console.error('  node filter.mjs --attr status --value 200');
   console.error('  node filter.mjs --attr detected_types --value hubspot_form --ci');
-  console.error('  node filter.mjs --attr url --value university.edu --contains --ci');
+  console.error('  node filter.mjs --attr url --value example.com --contains --ci');
   process.exit(1);
 }
 

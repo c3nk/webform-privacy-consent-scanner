@@ -184,8 +184,8 @@ node filter.mjs --attr detected_types --value hubspot --ci --contains
 
 #### Contains Search
 ```bash
-# Find URLs containing "university"
-node filter.mjs --attr url --value university --contains --ci
+# Find URLs containing "example"
+node filter.mjs --attr url --value example --contains --ci
 ```
 
 #### Different Input/Output Files
@@ -224,10 +224,10 @@ Filtered results: 13
 
 RESULTS:
 --------
-https://hsri.ozyegin.edu.tr/en/design-thinking-in-the-age-of-ai-comparing-traditional-and-ai-assisted-creativity-in-architectural-design
-https://hsri.ozyegin.edu.tr/en/carbon-negative-recycled-concrete-solutions
-https://hsri.ozyegin.edu.tr/en/sustainable-biocemented-3d-printing
-https://www.ozyegin.edu.tr/tr/sektorel-egitim/dersler/sec-101
+https://research.example.com/design-thinking-ai
+https://research.example.com/carbon-negative-concrete
+https://research.example.com/sustainable-3d-printing
+https://www.example.com/training/courses/sec-101
 ...
 ```
 
