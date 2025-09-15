@@ -36,8 +36,13 @@
   "files": [
     "scanner.mjs",
     "filter.mjs",
+    "lib/",
+    "form-detection-config.json",
     "bin/",
     "README.md",
+    "USERGUIDE.md",
+    "USERGUIDE_EN.md",
+    "CHANGELOG.md",
     "LICENSE",
     "examples/",
     "docs/social-preview.png"
