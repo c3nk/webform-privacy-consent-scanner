@@ -73,6 +73,62 @@
         }
       ]
     },
+    "formstack": {
+      "name": "Formstack Forms",
+      "enabled": true,
+      "patterns": [
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/[a-z0-9-]+\\.formstack\\.com\\/forms\\/[a-z0-9_-]+",
+          "description": "Formstack hosted form URL"
+        },
+        {
+          "type": "url",
+          "pattern": "https?:\\/\\/formstack\\.com\\/forms\\/[a-z0-9_-]+",
+          "description": "Formstack direct form URL"
+        },
+        {
+          "type": "script",
+          "pattern": "https?:\\/\\/[a-z0-9-]+\\.formstack\\.com\\/forms\\/js\\.php",
+          "description": "Formstack embed script"
+        },
+        {
+          "type": "script",
+          "pattern": "https?:\\/\\/static\\.formstack\\.com\\/forms\\/js\\/[a-z0-9_-]+\\.js",
+          "description": "Formstack static embed script"
+        },
+        {
+          "type": "html",
+          "pattern": "<iframe[^>]+src=[\"']https?:\\/\\/[a-z0-9-]+\\.formstack\\.com\\/forms\\/[^\"']+[\"']",
+          "description": "Formstack iframe embed"
+        },
+        {
+          "type": "html",
+          "pattern": "<script[^>]+src=[\"']https?:\\/\\/[a-z0-9-]+\\.formstack\\.com\\/forms\\/js\\.php[^\"']+[\"']",
+          "description": "Formstack embed script tag"
+        },
+        {
+          "type": "javascript",
+          "pattern": "Formstack\\.init\\s*\\(",
+          "description": "Formstack JavaScript initialization"
+        },
+        {
+          "type": "javascript",
+          "pattern": "fsForm\\d+",
+          "description": "Formstack form ID variable"
+        },
+        {
+          "type": "html",
+          "pattern": "data-formstack-[a-z]+",
+          "description": "Formstack data attributes"
+        },
+        {
+          "type": "html",
+          "pattern": "class=[\"'][^\"']*formstack[^\"']*[\"']",
+          "description": "Formstack CSS classes"
+        }
+      ]
+    },
     "microsoft": {
       "name": "Microsoft Forms",
       "enabled": true,
