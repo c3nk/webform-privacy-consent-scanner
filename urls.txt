@@ -11,3 +11,6 @@ examples/forms/microsoft.html?cmp=efilli&mode=mock
 # Additional test URLs
 https://www.c3nk.com/
 https://github.com/c3nk/webform-privacy-consent-scanner
+
+# Test collector patterns (local file)
+examples/forms/test-collectors.html
