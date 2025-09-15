@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import pLimit from 'p-limit';
+import { normalizeUrl, globMatch, parseCollectorPatterns, extractContext } from './lib/patterns.mjs';
 
 const argv = process.argv.slice(2);
 const getArg = (name, def = undefined) => {
@@ -54,6 +55,7 @@ if (!input) {
 // Prepare patterns from config (will be loaded in main)
 let patterns = {};
 let cmpPatterns = [];
+let collectorPatterns = [];
 let globalConfig = null; // Global config for fetchDynamic
 
 // Detection functions will be defined in main after config loading
@@ -320,7 +322,17 @@ async function main() {
   cmpPatterns = config.cmp.enabled ?
     config.cmp.patterns.map(p => new RegExp(p.pattern, 'i')) : [];
 
+  // Prepare collector patterns (CLI takes precedence over config)
+  if (collectorsArg) {
+    collectorPatterns = parseCollectorPatterns(collectorsArg);
+  } else if (config.collectors && config.collectors.enabled) {
+    collectorPatterns = config.collectors.patterns || [];
+  }
+
   console.log('CONFIG_LOADED: cmp.enabled =', config.cmp.enabled, 'cmpFlag =', cmpFlag);
+  if (collectorPatterns.length > 0) {
+    console.log('COLLECTOR_PATTERNS_LOADED:', collectorPatterns.length, 'patterns');
+  }
 
   // Define detection functions after config is loaded
   function detectCMP(html) {
@@ -358,7 +370,11 @@ async function main() {
       evidence: null,
       has_cmp: false,
       cmp_vendor: null,
-      cmp_evidence: null
+      cmp_evidence: null,
+      collectors_detected: false,
+      collector_link_count: 0,
+      collector_embed_count: 0,
+      collectors: []
     };
 
     const hay = html || '';
@@ -409,6 +425,86 @@ async function main() {
     // Debug logging for CMP detection
     if (cmpResult.has_cmp) {
       console.log(`✅ CMP detected: ${cmpResult.cmp_vendor} (${cmpResult.cmp_evidence})`);
+    }
+  }
+
+  // Collector pattern detection (DOM analysis)
+  if (collectorPatterns.length > 0) {
+    const baseUrl = url || '';
+    const collectedItems = new Map(); // Deduplication key -> item
+
+    // Extract and analyze different element types
+    const elementTypes = [
+      { selector: 'a[href]', relation: 'link' },
+      { selector: 'iframe[src]', relation: 'embed-iframe' },
+      { selector: 'script[src]', relation: 'embed-script' },
+      { selector: 'form[action]', relation: 'form-action' }
+    ];
+
+    for (const { selector, relation } of elementTypes) {
+      // Simple regex-based extraction (since we don't have DOM parser)
+      const regex = new RegExp(`${selector.replace('[', '\\[').replace(']', '\\]')}[^>]*>`, 'gi');
+      const matches = hay.match(regex) || [];
+
+      for (const match of matches) {
+        // Extract attribute value
+        let attrValue = '';
+        if (selector.includes('[href]')) {
+          const hrefMatch = match.match(/href=["']([^"']+)["']/i);
+          attrValue = hrefMatch ? hrefMatch[1] : '';
+        } else if (selector.includes('[src]')) {
+          const srcMatch = match.match(/src=["']([^"']+)["']/i);
+          attrValue = srcMatch ? srcMatch[1] : '';
+        } else if (selector.includes('[action]')) {
+          const actionMatch = match.match(/action=["']([^"']+)["']/i);
+          attrValue = actionMatch ? actionMatch[1] : '';
+        }
+
+        if (!attrValue) continue;
+
+        // Normalize URL
+        const normalizedUrl = normalizeUrl(attrValue, baseUrl);
+        if (!normalizedUrl) continue;
+
+        // Check against collector patterns
+        for (const pattern of collectorPatterns) {
+          if (globMatch(normalizedUrl, pattern)) {
+            const dedupKey = `${pattern}|${normalizedUrl.href}|${relation}`;
+            const context = extractContext(hay, match);
+
+            if (!collectedItems.has(dedupKey)) {
+              collectedItems.set(dedupKey, {
+                target_pattern: pattern,
+                matched_url: normalizedUrl.href,
+                relation: relation,
+                match_type: 'wildcard', // Simple wildcard for now
+                text_or_context: context
+              });
+
+              // Update counts
+              if (relation === 'link') {
+                result.collector_link_count++;
+              } else if (['embed-iframe', 'embed-script'].includes(relation)) {
+                result.collector_embed_count++;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Convert collected items to array
+    result.collectors = Array.from(collectedItems.values());
+    result.collectors_detected = result.collectors.length > 0;
+
+    // Debug logging
+    if (result.collectors_detected) {
+      console.log(`📊 Collector matches: ${result.collectors.length} items (${result.collector_link_count} links, ${result.collector_embed_count} embeds)`);
+      if (globalThis.process?.env?.VERBOSE) {
+        result.collectors.forEach(item => {
+          console.log(`  → ${item.relation}: ${item.matched_url} (${item.target_pattern})`);
+        });
+      }
     }
   }
 
