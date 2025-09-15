@@ -327,7 +327,7 @@ Scanner'ın debug bilgilerini görmek için terminal çıktısını inceleyin:
 ### 1. Temel Form Tarama
 ```bash
 # Google Forms içeren siteleri tara
-node scanner.mjs --input university-sites.txt
+node scanner.mjs --input example-sites.txt
 
 # Sonuç: Tüm Google Forms'lar tespit edilecektir
 ```
