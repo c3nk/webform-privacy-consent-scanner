@@ -23,6 +23,7 @@ const timeoutMs = parseInt(getArg('timeout', '15000'), 10);
 const dynamicFlag = !!getArg('dynamic', false);
 const dynamicWaitMs = parseInt(getArg('wait', '6000'), 10);
 const cmpFlag = !!getArg('cmp', false);
+const collectorsArg = getArg('collectors', '');
 
 // Generate timestamp for output files if not specified
 function generateTimestampedFilename(baseName) {
@@ -45,7 +46,7 @@ if (out) {
 }
 
 if (!input) {
-  console.error('Usage: node scanner.mjs --input urls.txt [--out results.csv] [--concurrency 8] [--timeout 15000] [--dynamic] [--wait 6000] [--cmp]');
+  console.error('Usage: node scanner.mjs --input urls.txt [--out results.csv] [--concurrency 8] [--timeout 15000] [--dynamic] [--wait 6000] [--cmp] [--collectors "pattern1/*,pattern2/*"]');
   console.error('Note: If --out is not specified, files will be saved with timestamp (e.g., results_2024-12-19T14-30-22.csv)');
   process.exit(1);
 }

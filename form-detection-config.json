@@ -206,11 +206,21 @@
       "[class*='gtm']"
     ]
   },
+  "collectors": {
+    "name": "Collector Patterns",
+    "enabled": true,
+    "patterns": [
+      "form.ozyegin.edu.tr/*",
+      "yourbrand.formstack.com/*"
+    ],
+    "include_subdomains": false
+  },
   "metadata": {
-    "description": "Form detection and CMP patterns configuration",
+    "description": "Form detection, CMP patterns, and collector patterns configuration",
     "last_updated": "2024-12-19",
     "author": "form-scanner",
-    "supported_forms": ["google", "hubspot", "microsoft"],
-    "supported_cmp_vendors": ["Cookiebot", "OneTrust", "Cookie Consent", "Efilli", "Google Tag Manager", "Generic"]
+    "supported_forms": ["google", "hubspot", "microsoft", "formstack"],
+    "supported_cmp_vendors": ["Cookiebot", "OneTrust", "Cookie Consent", "Efilli", "Google Tag Manager", "Generic"],
+    "supported_collectors": ["Custom glob patterns for link/iframe/script/form-action detection"]
   }
 }
