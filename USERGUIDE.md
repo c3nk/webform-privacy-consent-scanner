@@ -13,10 +13,10 @@
 
 ## Giriş
 
-Form Scanner, web sitelerinde Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms, Özyeğin Üniversitesi Forms ve diğer form türlerini tespit etmek için tasarlanmış güçlü bir CLI aracıdır. Ayrıca 3. parti uygulama linklerini tespit edebilir ve Cookie Consent Management Platform (CMP) detection özelliği ile çerez onay bannerlarını da tespit edebilir.
+Form Scanner, web sitelerinde Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms, Target Website Forms ve diğer form türlerini tespit etmek için tasarlanmış güçlü bir CLI aracıdır. Ayrıca 3. parti uygulama linklerini tespit edebilir ve Cookie Consent Management Platform (CMP) detection özelliği ile çerez onay bannerlarını da tespit edebilir.
 
 ### Temel Özellikler
-- ✅ Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms, Özyeğin Üniversitesi Forms tespiti
+- ✅ Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms, Target Website Forms tespiti
 - ✅ 3. parti uygulama link tespiti
 - ✅ Cookie Consent Management Platform detection
 - ✅ Statik ve dinamik tarama modları

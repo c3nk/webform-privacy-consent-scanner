@@ -28,28 +28,28 @@
       ]
     },
     "ozyegin": {
-      "name": "Özyeğin University Forms",
+      "name": "Target Website Forms",
       "enabled": true,
       "patterns": [
         {
           "type": "url",
           "pattern": "https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/[a-z0-9_-]*",
-          "description": "Özyeğin University form URL"
+          "description": "Target Website form URL"
         },
         {
           "type": "url",
           "pattern": "https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/.*",
-          "description": "Özyeğin University form with path"
+          "description": "Target Website form with path"
         },
         {
           "type": "html",
           "pattern": "<iframe[^>]+src=[\"']https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/[^\"']*[\"']",
-          "description": "Özyeğin University form iframe embed"
+          "description": "Target Website form iframe embed"
         },
         {
           "type": "html",
           "pattern": "<form[^>]+action=[\"']https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/[^\"']*[\"']",
-          "description": "Özyeğin University form action"
+          "description": "Target Website form action"
         }
       ]
     },

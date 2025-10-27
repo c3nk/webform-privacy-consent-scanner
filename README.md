@@ -36,7 +36,7 @@ webform-scanner --input urls.txt --dynamic --cmp
 
 ## ✨ Features
 
-- 🔍 **Multi-Platform Form Detection**: Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms, Özyeğin University Forms
+- 🔍 **Multi-Platform Form Detection**: Google Forms, HubSpot Forms, Microsoft Forms, Formstack Forms, Target Website Forms
 - 🔗 **3rd Party Application Link Detection**: Detects links to external applications and forms on websites
 - 🍪 **Comprehensive CMP Detection**: Cookiebot, OneTrust, Efilli, GTM, Generic GDPR
 - 🌐 **Advanced Scanning**: Static HTML + optional Playwright dynamic rendering
