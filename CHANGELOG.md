@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation wording updates: anonymized certain vendor-specific mentions to a neutral term (no functional changes)
 - README and User Guide text improvements for clarity and consistency
 
+## [0.1.9] - 2025-10-27
+
+### Changed
+- Documentation metadata update for re-publish
+
 ## [0.1.4] - 2025-01-15
 
 ### Added
