@@ -588,7 +588,7 @@ async function main() {
   const urls = listRaw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const limit = pLimit(concurrency);
 
-  const headers = ['url','method','status','is_ozyegin_form','is_yourcompany_form','is_example_form','is_google_form','is_hubspot_form','is_microsoft_form','is_formstack_form','detected_types','evidence','has_cmp','cmp_vendor','cmp_evidence','collectors_detected','collector_link_count','collector_embed_count','linked_forms_detected','linked_forms_count','note'];
+  const headers = ['url','method','status','is_target_website_form','is_yourcompany_form','is_example_form','is_google_form','is_hubspot_form','is_microsoft_form','is_formstack_form','detected_types','evidence','has_cmp','cmp_vendor','cmp_evidence','collectors_detected','collector_link_count','collector_embed_count','linked_forms_detected','linked_forms_count','note'];
   const rows = [toCsvRow(headers)];
   const resultsJson = [];
 
@@ -623,7 +623,7 @@ async function main() {
       url,
       method,
       st.status || 0,
-      det.ozyegin || false,
+      det.target_website || false,
       det.yourcompany || false,
       det.example || false,
       det.google || false,
@@ -646,7 +646,7 @@ async function main() {
       url,
       method,
       status: st.status || 0,
-      is_ozyegin_form: det.ozyegin || false,
+      is_target_website_form: det.target_website || false,
       is_yourcompany_form: det.yourcompany || false,
       is_example_form: det.example || false,
       is_google_form: det.google || false,

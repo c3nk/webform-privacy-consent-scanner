@@ -27,31 +27,10 @@
         }
       ]
     },
-    "ozyegin": {
+    "target_website": {
       "name": "Target Website Forms",
-      "enabled": true,
-      "patterns": [
-        {
-          "type": "url",
-          "pattern": "https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/[a-z0-9_-]*",
-          "description": "Target Website form URL"
-        },
-        {
-          "type": "url",
-          "pattern": "https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/.*",
-          "description": "Target Website form with path"
-        },
-        {
-          "type": "html",
-          "pattern": "<iframe[^>]+src=[\"']https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/[^\"']*[\"']",
-          "description": "Target Website form iframe embed"
-        },
-        {
-          "type": "html",
-          "pattern": "<form[^>]+action=[\"']https?:\\/\\/form\\.ozyegin\\.edu\\.tr\\/[^\"']*[\"']",
-          "description": "Target Website form action"
-        }
-      ]
+      "enabled": false,
+      "patterns": []
     },
     "example": {
       "name": "Example Custom Form",
@@ -358,7 +337,7 @@
     "description": "Form detection, CMP patterns, and collector patterns configuration",
     "last_updated": "2024-12-19",
     "author": "form-scanner",
-    "supported_forms": ["ozyegin", "yourcompany", "example", "google", "hubspot", "microsoft", "formstack"],
+    "supported_forms": ["target_website", "yourcompany", "example", "google", "hubspot", "microsoft", "formstack"],
     "supported_cmp_vendors": ["Cookiebot", "OneTrust", "Cookie Consent", "Efilli", "Google Tag Manager", "Generic"],
     "supported_collectors": ["Custom glob patterns for link/iframe/script/form-action detection"]
   }

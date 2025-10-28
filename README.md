@@ -128,7 +128,7 @@ node filter.mjs --attr url --value example.com --ci --contains
 
 ### CSV Format
 ```csv
-url,method,status,is_ozyegin_form,is_yourcompany_form,is_example_form,is_google_form,is_hubspot_form,is_microsoft_form,is_formstack_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,collectors_detected,collector_link_count,collector_embed_count,linked_forms_detected,linked_forms_count,note
+url,method,status,is_target_website_form,is_yourcompany_form,is_example_form,is_google_form,is_hubspot_form,is_microsoft_form,is_formstack_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,collectors_detected,collector_link_count,collector_embed_count,linked_forms_detected,linked_forms_count,note
 https://www.c3nk.com/examples/forms/hubspot.html?cmp=cookiebot&mode=mock,dynamic,200,false,true,false,["hubspot"],"hbspt.forms.create(",true,"Cookiebot","Cookiebot",true,2,1,
 https://www.c3nk.com/examples/forms/google.html?cmp=onetrust&mode=mock,dynamic,200,true,false,false,["google"],"docs.google.com/forms",true,"Cookiebot","cookiebot",false,0,0,
 https://www.c3nk.com/examples/forms/microsoft.html?cmp=efilli&mode=mock,dynamic,200,false,false,true,["microsoft"],"forms.office.com",true,"Cookiebot","cookiebot",true,1,1,

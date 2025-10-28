@@ -113,7 +113,7 @@ node scanner.mjs --input urls.txt --timeout 30000
 
 ### CSV Formatı
 ```csv
-url,method,status,is_ozyegin_form,is_yourcompany_form,is_example_form,is_google_form,is_hubspot_form,is_microsoft_form,is_formstack_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,collectors_detected,collector_link_count,collector_embed_count,linked_forms_detected,linked_forms_count,note
+url,method,status,is_target_website_form,is_yourcompany_form,is_example_form,is_google_form,is_hubspot_form,is_microsoft_form,is_formstack_form,detected_types,evidence,has_cmp,cmp_vendor,cmp_evidence,collectors_detected,collector_link_count,collector_embed_count,linked_forms_detected,linked_forms_count,note
 https://example.com,static,200,true,false,false,google,"Google Forms direct URL pattern",false,,,
 https://site.com,dynamic,200,false,true,false,hubspot,"HubSpot forms script",true,Efilli,efilli,
 ```
